@@ -12,6 +12,7 @@ let activeTab = CONFIG.UI.DEFAULT_TAB;
 let previousTab = null;
 let arenaMode = false;
 let lastMainTab = null;
+let lastArenaTab = null;
 
 const mainTabs = ['fests', 'leaderboard', 'partners'];
 const arenaTabs = ['arena', 'didyliv', 'hradivka'];
@@ -69,6 +70,11 @@ function setAnchorLabel(text) {
 function enterArenaMode(tabKey) {
   if (arenaMode) return;
   
+  // If clicking Arena button, restore last arena tab
+  if (tabKey === 'arena' && lastArenaTab && lastArenaTab !== 'arena') {
+    tabKey = lastArenaTab;
+  }
+  
   lastMainTab = mainTabs.includes(activeTab) ? activeTab : 'fests';
   arenaMode = true;
   haptic('medium');
@@ -83,6 +89,7 @@ function enterArenaMode(tabKey) {
   
   previousTab = activeTab;
   activeTab = tabKey;
+  lastArenaTab = tabKey;
   
   updateTabUI(tabKey);
   bounceIcon(tabKey);
@@ -98,6 +105,7 @@ function enterArenaMode(tabKey) {
 function exitArenaMode() {
   if (!arenaMode) return;
   
+  lastArenaTab = arenaTabs.includes(activeTab) ? activeTab : 'arena';
   arenaMode = false;
   haptic('medium');
   
@@ -165,6 +173,11 @@ export function switchTab(tabKey) {
   previousTab = activeTab;
   activeTab = tabKey;
   haptic('light');
+  
+  // Track last arena tab for return logic
+  if (arenaMode && arenaTabs.includes(tabKey)) {
+    lastArenaTab = tabKey;
+  }
   
   const scroller = document.getElementById('app-wrap');
   if (scroller) scroller.scrollTop = 0;

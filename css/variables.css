@@ -51,7 +51,7 @@
   /* ---- Tab Bar Fade ---- */
   --tabs-height: 64px;
   --tabs-offset: 20px;
-  --tabs-fade-extra: 56px;
+  --tabs-fade-extra: 16px;
   --tabs-fade-height: calc(var(--tabs-height) + var(--tabs-offset) + env(safe-area-inset-bottom, 0px) + var(--tabs-fade-extra));
 }
 

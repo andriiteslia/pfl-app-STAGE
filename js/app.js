@@ -163,6 +163,7 @@ function initTelegram() {
     
     function setPad(px) {
       document.documentElement.style.setProperty('--app-top-pad', px + 'px');
+      document.body.classList.toggle('fullscreen-active', px >= FULLSCREEN_PAD);
     }
     
     function isMobileClient() {

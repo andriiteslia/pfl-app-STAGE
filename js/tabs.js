@@ -14,7 +14,7 @@ let arenaMode = false;
 let lastMainTab = null;
 
 const mainTabs = ['fests', 'leaderboard', 'partners'];
-const arenaTabs = ['arena', 'hradivka', 'didyliv'];
+const arenaTabs = ['arena', 'didyliv', 'hradivka'];
 const tabOrder = [...mainTabs, ...arenaTabs];
 
 const tabCallbacks = new Map();

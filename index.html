@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>Predator Fest League</title>
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- Theme initialization (before render to prevent flash) -->
+  <script>
+    (function() {
+      try {
+        var override = localStorage.getItem('theme_override');
+        if (override === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          return;
+        }
+        var tg = window.Telegram && window.Telegram.WebApp;
+        if (tg && tg.colorScheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch(e) {}
+    })();
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/tabs.css">
+  <link rel="stylesheet" href="css/leaderboard.css">
+  <link rel="stylesheet" href="css/partners.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+  <!-- App Container -->
+  <div id="app-wrap">
+    <main id="app-content">
+
+      <!-- ========== FESTS TAB ========== -->
+      <section id="tab-fests" class="tab-content active" aria-label="Fests tab">
+        <header class="fests-header">
+          <div class="fests-header__text">
+            <h1 class="page-title">Fests 🎣</h1>
+            <p class="page-subtitle" id="subtitle-fests">Актуальні результати</p>
+          </div>
+          <div class="fests-header__actions">
+            <button class="btn btn-theme" id="themeToggle" type="button" aria-label="Toggle theme">🌙</button>
+            <button class="btn" id="reload" type="button"><span class="btn-label">Оновити</span></button>
+          </div>
+        </header>
+
+        <div class="fests-year-tags" id="festsYearTags">
+          <button class="fests-year-tag" data-year="2026">2026</button>
+          <button class="fests-year-tag active" data-year="2025">2025</button>
+        </div>
+
+        <!-- ===== 2026 Fests ===== -->
+        <div id="festsYear2026" class="fests-year-panel" style="display: none;">
+          <div class="empty-state" id="yearLoader2026">
+            <img src="./assets/imgs/perch.png" alt="Perch" width="160" height="160">
+            <p class="empty-state__text" id="yearLoader2026Text">Зачекайте будь ласка,<br>оновлюю дані...</p>
+          </div>
+          <div id="fests2026Container"></div>
+        </div>
+
+        <!-- ===== 2025 Fests ===== -->
+        <div id="festsYear2025" class="fests-year-panel">
+          
+          <!-- PERCH MASTER -->
+          <article class="card">
+            <div class="table-header" id="tableHeaderPerch">
+              <div class="table-header__text">
+                <div class="card-title" style="font-weight:800;">PERCH MASTER</div>
+                <div style="font-size:15px; color:var(--muted);">Майдан, Чарівні Озера (07.12.25)</div>
+                <div class="score-tag score-tag--personal">Особистий залік 💪</div>
+              </div>
+              <div class="chevron" id="chevronPerch">
+                <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </div>
+            </div>
+            <div class="segmented-control" id="segmentPerch" style="display: none;">
+              <button class="segment active" type="button" data-view="results">Результати</button>
+              <button class="segment" type="button" data-view="tours">Тури</button>
+            </div>
+            <div id="outPerchResults" class="table-content table-collapsed"></div>
+            <div id="outPerchTours" class="table-content table-collapsed"></div>
+          </article>
+
+          <!-- PREDATOR CUP 2025 -->
+          <article class="card">
+            <div class="table-header" id="tableHeaderPredator">
+              <div class="table-header__text">
+                <div class="card-title" style="font-weight:800;">PREDATOR CUP 2025</div>
+                <div style="font-size:15px; color:var(--muted);">Дідилів, Озеро Дідилів (16.11.25)</div>
+                <div class="score-tag score-tag--combo">Командно-особистий залік 🤘</div>
+              </div>
+              <div class="chevron" id="chevronPredator">
+                <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </div>
+            </div>
+            <div class="segmented-control" id="segmentPredator" style="display: none;">
+              <button class="segment active" type="button" data-view="personal">Особистий</button>
+              <button class="segment" type="button" data-view="team">Командний</button>
+            </div>
+            <div id="outPredatorPersonal" class="table-content table-collapsed"></div>
+            <div id="outPredatorTeam" class="table-content table-collapsed"></div>
+          </article>
+
+          <!-- Predator 2025 -->
+          <article class="card">
+            <div class="table-header" id="tableHeaderPredator2">
+              <div class="table-header__text">
+                <div class="card-title" style="font-weight:800;">Predator 2025</div>
+                <div style="font-size:15px; color:var(--muted);">Майдан, Чарівні Озера (05.10.25)</div>
+                <div class="score-tag score-tag--team">Командний залік 🤜🤛</div>
+              </div>
+              <div class="chevron" id="chevronPredator2">
+                <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </div>
+            </div>
+            <div id="outPredator2" class="table-content table-collapsed"></div>
+          </article>
+
+          <!-- Donation info -->
+          <div style="margin-top:32px; margin-bottom:32px; font-size:16px; color:var(--muted); text-align:center;">
+            Передано на потреби збройних сил – <span style="white-space:nowrap;">29 500 грн 🇺🇦</span>
+          </div>
+
+          <!-- Badge -->
+          <div style="margin-top:16px; margin-bottom:48px; display:flex; justify-content:center; align-items:center; height:40px;">
+            <a href="https://t.me/andriiteslia" target="_blank" rel="noopener noreferrer" style="display:block; height:40px;">
+              <img id="badgeImg" src="assets/imgs/badge_light.png" alt="badge" style="height:40px; width:auto; display:block;">
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== LEADERBOARD TAB ========== -->
+      <section id="tab-leaderboard" class="tab-content" aria-label="Leaderboard tab">
+        <header class="fests-header">
+          <div class="fests-header__text">
+            <h1 class="page-title">Leaderboard 🏆</h1>
+            <p class="page-subtitle" id="subtitle-leaderboard">
+              Рейтинг учасників Predator Fest League. Головний приз - 23 Shimano Vanquish 2500S!
+            </p>
+          </div>
+          <div class="fests-header__actions">
+            <button class="btn" id="reloadLeaderboard" type="button">Оновити</button>
+          </div>
+        </header>
+
+        <article class="card leaderboard-card">
+          <div id="outLeaderboard">
+            <!-- Skeleton loader (from index_old.html) -->
+            <div class="lb-skeleton">
+              <!-- Podium skeleton -->
+              <div class="lb-skel-podium-wrap">
+                <div class="lb-skel-people">
+                  <!-- place 2 -->
+                  <div class="lb-skel-person p2">
+                    <div class="skel-w lb-skel-avatar" style="width:68px;height:68px;"></div>
+                    <div class="skel-w lb-skel-name1" style="width:58px;"></div>
+                    <div class="skel-w lb-skel-name2" style="width:44px;"></div>
+                    <div class="skel-w lb-skel-pts" style="width:52px;"></div>
+                  </div>
+                  <!-- place 1 -->
+                  <div class="lb-skel-person p1">
+                    <div class="skel-w lb-skel-crown"></div>
+                    <div class="skel-w lb-skel-avatar" style="width:80px;height:80px;"></div>
+                    <div class="skel-w lb-skel-name1" style="width:68px;"></div>
+                    <div class="skel-w lb-skel-name2" style="width:52px;"></div>
+                    <div class="skel-w lb-skel-pts" style="width:56px;"></div>
+                  </div>
+                  <!-- place 3 -->
+                  <div class="lb-skel-person p3">
+                    <div class="skel-w lb-skel-avatar" style="width:56px;height:56px;"></div>
+                    <div class="skel-w lb-skel-name1" style="width:52px;"></div>
+                    <div class="skel-w lb-skel-name2" style="width:40px;"></div>
+                    <div class="skel-w lb-skel-pts" style="width:48px;"></div>
+                  </div>
+                </div>
+                <div class="lb-skel-stands">
+                  <div class="skel-w lb-skel-stand s2"></div>
+                  <div class="skel-w lb-skel-stand s1"></div>
+                  <div class="skel-w lb-skel-stand s3"></div>
+                </div>
+              </div>
+              <!-- Table rows skeleton -->
+              <div class="lb-skel-table">
+                <div class="lb-skel-row">
+                  <div class="skel lb-skel-cell" style="width:22px;height:22px;border-radius:50%;"></div>
+                  <div class="skel lb-skel-cell" style="width:140px;height:14px;"></div>
+                  <div class="skel lb-skel-cell" style="width:32px;height:14px;margin-left:auto;"></div>
+                  <div class="skel lb-skel-cell" style="width:42px;height:14px;"></div>
+                </div>
+                <div class="lb-skel-row">
+                  <div class="skel lb-skel-cell" style="width:22px;height:22px;border-radius:50%;"></div>
+                  <div class="skel lb-skel-cell" style="width:120px;height:14px;"></div>
+                  <div class="skel lb-skel-cell" style="width:32px;height:14px;margin-left:auto;"></div>
+                  <div class="skel lb-skel-cell" style="width:42px;height:14px;"></div>
+                </div>
+                <div class="lb-skel-row">
+                  <div class="skel lb-skel-cell" style="width:22px;height:22px;border-radius:50%;"></div>
+                  <div class="skel lb-skel-cell" style="width:150px;height:14px;"></div>
+                  <div class="skel lb-skel-cell" style="width:32px;height:14px;margin-left:auto;"></div>
+                  <div class="skel lb-skel-cell" style="width:42px;height:14px;"></div>
+                </div>
+                <div class="lb-skel-row">
+                  <div class="skel lb-skel-cell" style="width:22px;height:22px;border-radius:50%;"></div>
+                  <div class="skel lb-skel-cell" style="width:130px;height:14px;"></div>
+                  <div class="skel lb-skel-cell" style="width:32px;height:14px;margin-left:auto;"></div>
+                  <div class="skel lb-skel-cell" style="width:42px;height:14px;"></div>
+                </div>
+                <div class="lb-skel-row">
+                  <div class="skel lb-skel-cell" style="width:22px;height:22px;border-radius:50%;"></div>
+                  <div class="skel lb-skel-cell" style="width:115px;height:14px;"></div>
+                  <div class="skel lb-skel-cell" style="width:32px;height:14px;margin-left:auto;"></div>
+                  <div class="skel lb-skel-cell" style="width:42px;height:14px;"></div>
+                </div>
+                <div class="lb-skel-row">
+                  <div class="skel lb-skel-cell" style="width:22px;height:22px;border-radius:50%;"></div>
+                  <div class="skel lb-skel-cell" style="width:138px;height:14px;"></div>
+                  <div class="skel lb-skel-cell" style="width:32px;height:14px;margin-left:auto;"></div>
+                  <div class="skel lb-skel-cell" style="width:42px;height:14px;"></div>
+                </div>
+                <div class="lb-skel-row">
+                  <div class="skel lb-skel-cell" style="width:22px;height:22px;border-radius:50%;"></div>
+                  <div class="skel lb-skel-cell" style="width:125px;height:14px;"></div>
+                  <div class="skel lb-skel-cell" style="width:32px;height:14px;margin-left:auto;"></div>
+                  <div class="skel lb-skel-cell" style="width:42px;height:14px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <div class="leaderboard-pdf-cta">
+          <a class="link-btn" id="pflPdfLink" href="https://www.instagram.com/p/DVGPuL9CPMQ/?img_index=1" target="_blank" rel="noopener">
+            Переглянути умови PFL 2026 📝
+          </a>
+        </div>
+      </section>
+
+      <!-- ========== ARENA TAB ========== -->
+      <section id="tab-arena" class="tab-content arena-empty" aria-label="Arena tab">
+        <header class="fests-header">
+          <div class="fests-header__text">
+            <h1 class="page-title">Arena ⭐️</h1>
+            <p class="page-subtitle" id="subtitle-arena">
+              Рейтинг і результати змагань різних форматів та дисциплін.
+            </p>
+          </div>
+          <div class="fests-header__actions">
+            <button class="btn" id="reloadArena" type="button">Оновити</button>
+          </div>
+        </header>
+
+        <div class="fests-year-tags" id="arenaTags" style="display: none;"></div>
+        <div id="arenaCards" style="display: none;"></div>
+
+        <div class="empty-state" id="arenaEmptyState">
+          <img src="./assets/imgs/pike.png" alt="Pike" width="160" height="160">
+          <p class="empty-state__text" id="arenaEmptyText">
+            Зачекайте будь ласка...<br>Ех, зараз би якийсь фюжин 2.5' 🤤
+          </p>
+        </div>
+      </section>
+
+      <!-- ========== PARTNERS TAB ========== -->
+      <section id="tab-partners" class="tab-content" aria-label="Partners tab">
+        <div id="partnersListView">
+          <h1 class="page-title">Partners 🤝</h1>
+          <p class="page-subtitle">
+            Партнери та спонсори, які підтримують Predator Fest League призами та допомогою в організації.
+          </p>
+
+          <div class="partners-grid">
+            <!-- Upstream -->
+            <article class="partner-tile" 
+                     data-partner="upstream"
+                     data-instagram="https://www.instagram.com/upstreambaits/"
+                     data-details-subtitle="📦 Онлайн-замовлення цілодобово.<br>🕘 Пн – Пт з 10:00 до 18:00<br>📱 Телефон: +38 (067) 13 13 110">
+              <div class="partner-tile__logo">
+                <img src="./assets/logos/upstream.svg" alt="Upstream" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="logo-fallback">Upstream</div>
+              </div>
+              <div class="partner-tile__body">
+                <h2 class="partner-title">Upstream</h2>
+                <p class="partner-subtitle">Силіконові приманки</p>
+                <a class="link-btn" href="https://upstreambaits.com/shop/" target="_blank" rel="noopener">
+                  В магазин 🐟
+                </a>
+              </div>
+            </article>
+
+            <!-- M5Craft -->
+            <article class="partner-tile"
+                     data-partner="m5craft"
+                     data-instagram="https://www.instagram.com/megaklev.com.ua"
+                     data-details-subtitle="Авторські приманки M5Craft на Megaklev — ручна робота та лімітні серії.">
+              <div class="partner-tile__logo">
+                <span class="partner-discount-tag">-10%</span>
+                <img src="./assets/logos/m5craft.svg" alt="M5Craft"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="logo-fallback">M5Craft</div>
+              </div>
+              <div class="partner-tile__body">
+                <h2 class="partner-title">M5Craft</h2>
+                <p class="partner-subtitle">Авторські приманки</p>
+                <a class="link-btn" href="https://megaklev.com.ua/m5craft" target="_blank" rel="noopener">
+                  В магазин 🐟
+                </a>
+              </div>
+            </article>
+
+            <!-- Crazy Fish -->
+            <article class="partner-tile"
+                     data-partner="crazyfish"
+                     data-instagram="https://www.instagram.com/crazy_fish_official/"
+                     data-details-subtitle="Офіційний сайт Crazy Fish — силікон і снасті для ультралайту та джигу.">
+              <div class="partner-tile__logo">
+                <img src="./assets/logos/crazyfish.png" alt="Crazy Fish"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="logo-fallback">Crazy Fish</div>
+              </div>
+              <div class="partner-tile__body">
+                <h2 class="partner-title">Crazy Fish</h2>
+                <p class="partner-subtitle">Силіконові приманки</p>
+                <a class="link-btn" href="https://crazyfish.com.ua/ua/" target="_blank" rel="noopener">
+                  В магазин 🐟
+                </a>
+              </div>
+            </article>
+
+            <!-- The Main Barbershop -->
+            <article class="partner-tile"
+                     data-partner="themain"
+                     data-instagram="https://www.instagram.com/the_main_barbershop/"
+                     data-details-subtitle="Барбершоп The Main — стрижки, борода та гоління. Запис через Instagram.">
+              <div class="partner-tile__logo">
+                <img src="./assets/logos/themain.svg" alt="The Main Barbershop"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="logo-fallback">The Main</div>
+              </div>
+              <div class="partner-tile__body">
+                <h2 class="partner-title">The Main Barbershop</h2>
+                <p class="partner-subtitle">Чоловічі стрижки | Гоління</p>
+                <a class="link-btn" href="https://www.instagram.com/the_main_barbershop/" target="_blank" rel="noopener">
+                  В instagram 📸
+                </a>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- Partner Details View (hidden by default) -->
+        <div id="partnerDetailsView" class="partner-details" style="display:none;">
+          <!-- Logo Header -->
+          <div class="partner-details__header" id="partnerDetailsLogo">
+            <img id="partnerDetailsLogoImg" src="" alt="">
+          </div>
+
+          <!-- Body -->
+          <div class="partner-details__body">
+            <h2 class="partner-details__title" id="partnerDetailsTitle"></h2>
+            <p class="partner-details__subtitle" id="partnerDetailsSubtitle"></p>
+
+            <!-- Promo Block -->
+            <div class="partner-promo" id="partnerDetailsPromoWrap" style="display:none;">
+              <div class="partner-promo__badge">-10%</div>
+              <div class="partner-promo__body">
+                <span class="partner-promo__label" id="partnerDetailsPromoLabel">Промокод для знижки</span>
+                <div class="partner-promo__row">
+                  <code class="partner-promo__code" id="partnerDetailsPromoCode"></code>
+                  <button class="partner-promo__copy" id="partnerDetailsPromoCopy" type="button">
+                    <svg class="partner-promo__copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    <svg class="partner-promo__check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span class="partner-promo__copy-text">Копіювати</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main CTA -->
+            <a class="btn partner-details__cta-main" id="partnerDetailsCta" href="#" target="_blank" rel="noopener"></a>
+
+            <!-- Secondary CTA (Instagram etc.) -->
+            <div id="partnerDetailsSecondaryWrap" style="display:none;">
+              <a class="btn partner-details__cta-secondary" id="partnerDetailsSecondaryCta" href="#" target="_blank" rel="noopener"></a>
+            </div>
+
+            <!-- Info Block -->
+            <div class="partner-info-block">
+              <div class="partner-info-block__title">Контакти</div>
+              <p class="partner-info-block__text" id="partnerDetailsInfo"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== HRADIVKA TAB ========== -->
+      <section id="tab-hradivka" class="tab-content" aria-label="Hradivka tab">
+        <header class="fests-header">
+          <div class="fests-header__text">
+            <h1 class="page-title">Hradivka Lake 🏕️</h1>
+            <p class="page-subtitle" id="subtitle-hradivka">
+              Рейтинг і результати змагань на Градівці.
+            </p>
+          </div>
+          <div class="fests-header__actions">
+            <button class="btn" id="reloadHradivka" type="button">Оновити</button>
+          </div>
+        </header>
+
+        <div class="fests-year-tags" id="hradivkaTags" style="display: none;"></div>
+        <div id="hradivkaCards" style="display: none;"></div>
+
+        <div class="empty-state" id="hradivkaEmptyState">
+          <img src="./assets/imgs/hradivka.png" alt="Hradivka" width="160" height="160">
+          <p class="empty-state__text" id="hradivkaEmptyText">
+            Зачекайте будь ласка...<br>Завантажую дані Градівки...
+          </p>
+        </div>
+      </section>
+
+      <!-- ========== DIDYLIV TAB ========== -->
+      <section id="tab-didyliv" class="tab-content" aria-label="Didyliv tab">
+        <div class="venue-header">
+          <div class="venue-header__top">
+            <img id="didylivLogo" class="venue-header__logo" src="./assets/imgs/didyliv_logo_light.svg" alt="Ozero Didyliv" width="80" height="80">
+            <button class="btn" id="reloadDidyliv" type="button">Оновити</button>
+          </div>
+          <h1 class="page-title">Ozero Didyliv 🌳</h1>
+          <p class="page-subtitle" id="subtitle-didyliv">
+            Актуальні результати
+          </p>
+        </div>
+
+        <!-- About links (loaded from ABOUT_Didyliv sheet) -->
+        <div id="didylivAbout" class="venue-about" style="display: none;">
+          <a id="didylivBtnPrimary" class="venue-about__link" href="#" target="_blank" rel="noopener" style="display:none;"></a>
+          <span id="didylivAboutDot" class="venue-about__dot" style="display:none;">•</span>
+          <a id="didylivBtnSecondary" class="venue-about__link" href="#" target="_blank" rel="noopener" style="display:none;"></a>
+        </div>
+
+        <hr id="didylivDivider" class="venue-divider" style="display: none;">
+
+        <div class="fests-year-tags" id="didylivTags" style="display: none;"></div>
+        <div id="didylivCards" style="display: none;"></div>
+
+        <div class="empty-state" id="didylivEmptyState">
+          <img src="./assets/imgs/didyliv.png" alt="Didyliv" width="160" height="160">
+          <p class="empty-state__text" id="didylivEmptyText">
+            Зачекайте будь ласка,<br>оновлюю дані...
+          </p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Bottom Tab Bar -->
+  <nav class="tabs-bar" role="tablist" aria-label="Main navigation">
+    <div class="tabs tabs-main">
+      <button class="tab-btn tab-btn--anchor active" data-tab="fests" role="tab" aria-selected="true">
+        <span class="tab-icon">🎣</span>
+        <span class="tab-label">Fests</span>
+      </button>
+      <button class="tab-btn tab-btn--expandable" data-tab="leaderboard" role="tab" aria-selected="false">
+        <span class="tab-icon">🏆</span>
+        <span class="tab-label">Leaderboard</span>
+      </button>
+      <button class="tab-btn tab-btn--expandable" data-tab="partners" role="tab" aria-selected="false">
+        <span class="tab-icon">🤝</span>
+        <span class="tab-label">Partners</span>
+      </button>
+    </div>
+    <div class="tabs tabs-solo">
+      <button class="tab-btn tab-btn--arena" data-tab="arena" role="tab" aria-selected="false">
+        <span class="tab-icon">⭐️</span>
+        <span class="tab-label">Arena</span>
+      </button>
+      <button class="tab-btn tab-btn--venue" data-tab="hradivka" role="tab" aria-selected="false">
+        <span class="tab-icon">🏕️</span>
+        <span class="tab-label">Hradivka</span>
+      </button>
+      <button class="tab-btn tab-btn--venue" data-tab="didyliv" role="tab" aria-selected="false">
+        <span class="tab-icon">🌳</span>
+        <span class="tab-label">Didyliv</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Back FAB (for partner details) -->
+  <button id="fabBack" class="fab-back" type="button" aria-label="Back">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M10.293 5.293a1 1 0 011.414 1.414L7.414 11H19a1 1 0 110 2H7.414l4.293 4.293a1 1 0 01-1.414 1.414l-6-6a1 1 0 010-1.414l6-6z" fill="currentColor"/>
+    </svg>
+  </button>
+
+  <!-- Badge & logo theme script -->
+  <script>
+    (function(){
+      function updateThemedImages(){
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var badge = document.getElementById('badgeImg');
+        if(badge) badge.src = isDark ? 'assets/imgs/badge_dark.png' : 'assets/imgs/badge_light.png';
+        var didylivLogo = document.getElementById('didylivLogo');
+        if(didylivLogo) didylivLogo.src = isDark ? './assets/imgs/didyliv_logo_dark.svg' : './assets/imgs/didyliv_logo_light.svg';
+      }
+      updateThemedImages();
+      var obs = new MutationObserver(updateThemedImages);
+      obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    })();
+  </script>
+
+  <!-- Main App Script -->
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>

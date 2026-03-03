@@ -1,0 +1,429 @@
+/* ============================================
+   PFL App — Partners Styles
+   Grid layout, partner tiles, details view
+   ============================================ */
+
+/* ---- Partners Grid ---- */
+.partners-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+@media (max-width: 360px) {
+  .partners-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Partner Tile ---- */
+.partner-tile {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  backdrop-filter: saturate(1.8) blur(20px);
+  -webkit-backdrop-filter: saturate(1.8) blur(20px);
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.partner-tile:active {
+  transform: scale(0.98);
+}
+
+/* ---- Logo Section ---- */
+.partner-tile__logo {
+  position: relative;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: #000000;
+  overflow: hidden;
+}
+
+/* Individual partner logo backgrounds */
+.partner-tile[data-partner="upstream"] .partner-tile__logo {
+  background: #000000;
+}
+
+.partner-tile[data-partner="m5craft"] .partner-tile__logo {
+  background: #020102;
+}
+
+.partner-tile[data-partner="crazyfish"] .partner-tile__logo {
+  background: #DF127B;
+}
+
+.partner-tile[data-partner="themain"] .partner-tile__logo {
+  background: #000000;
+}
+
+.partner-tile__logo img {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.logo-fallback {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Discount Tag */
+.partner-discount-tag {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #10B981;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  line-height: 1;
+}
+
+/* ---- Body Section ---- */
+.partner-tile__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--spacing-md);
+}
+
+.partner-title {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--card-title-font-size);
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.partner-subtitle {
+  margin: var(--spacing-xs) 0 0;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.partner-tile__body .link-btn {
+  margin-top: var(--spacing-md);
+  display: inline;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--brand);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.partner-tile__body .link-btn:hover {
+  filter: none;
+  text-decoration: underline;
+}
+
+/* ---- Partner Details View ---- */
+.partner-details {
+  display: none;
+}
+
+.partner-details.slide-in {
+  animation: partner-slide-in 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes partner-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ---- Details Header (Logo) ---- */
+.partner-details__header {
+  position: relative;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+}
+
+.partner-details__header img {
+  max-width: 70%;
+  max-height: 100px;
+  object-fit: contain;
+}
+
+/* ---- Details Body ---- */
+.partner-details__body {
+  padding-top: var(--spacing-xl);
+}
+
+.partner-details__title {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.partner-details__subtitle {
+  margin: 0 0 var(--spacing-xl);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* ---- CTA Buttons ---- */
+.partner-details__cta-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.partner-details__cta-main:hover {
+  text-decoration: none;
+}
+
+.partner-details__cta-secondary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  box-shadow: none;
+}
+
+.partner-details__cta-secondary:hover {
+  text-decoration: none;
+  background: var(--brand-bg);
+}
+
+#partnerDetailsSecondaryWrap {
+  margin-top: var(--spacing-sm);
+}
+
+/* ---- Promo Block ---- */
+.partner-promo {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  margin: var(--spacing-xl) 0;
+  border-radius: var(--radius-md);
+  background: var(--card);
+  border: 1.5px solid rgba(18, 122, 201, 0.18);
+  box-shadow: 0 2px 8px rgba(18, 122, 201, 0.06);
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.partner-promo__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #1E8FE1 0%, #0F6FC0 100%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.partner-promo__body {
+  flex: 1;
+  min-width: 0;
+  padding: var(--spacing-md) var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.partner-promo__label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.partner-promo__row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.partner-promo__code {
+  font-family: "Manrope", monospace;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  flex: 1;
+}
+
+.partner-promo__copy {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--brand);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.partner-promo__copy:active {
+  transform: scale(0.96);
+}
+
+.partner-promo__copy-icon,
+.partner-promo__check-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.partner-promo__check-icon {
+  display: none;
+}
+
+/* Copied state */
+.partner-promo.is-copied {
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.10);
+}
+
+.partner-promo.is-copied .partner-promo__badge {
+  background: linear-gradient(180deg, #10B981 0%, #059669 100%);
+}
+
+.partner-promo.is-copied .partner-promo__copy {
+  background: rgba(16, 185, 129, 0.10);
+  border-color: rgba(16, 185, 129, 0.30);
+  color: #059669;
+}
+
+.partner-promo.is-copied .partner-promo__copy-icon {
+  display: none;
+}
+
+.partner-promo.is-copied .partner-promo__check-icon {
+  display: block;
+}
+
+/* Dark theme adjustments */
+:root[data-theme="dark"] .partner-promo {
+  border-color: rgba(78, 163, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+:root[data-theme="dark"] .partner-promo.is-copied {
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+/* ---- Info Block ---- */
+.partner-info-block {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--brand-bg);
+  border-radius: var(--radius-md);
+}
+
+.partner-info-block__title {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.partner-info-block__text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+/* ---- Hide Tab Bar when details open ---- */
+body.partners-details-open .tabs-bar,
+body.partners-details-open::after {
+  display: none !important;
+}
+
+/* ---- Back FAB ---- */
+.fab-back {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  width: 56px;
+  height: 56px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(18, 122, 201, 0.4);
+  cursor: pointer;
+  z-index: 101;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.fab-back:active {
+  transform: scale(0.95);
+}
+
+.fab-back.visible {
+  display: flex;
+}
+
+.fab-back svg {
+  width: 24px;
+  height: 24px;
+}

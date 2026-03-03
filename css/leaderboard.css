@@ -1,0 +1,824 @@
+/* ============================================
+   PFL App — Leaderboard Styles
+   Based on index_old.html
+   ============================================ */
+
+/* ---- Leaderboard Table Styles ---- */
+#tab-leaderboard table tbody tr td,
+#tab-leaderboard table tbody tr td:first-child {
+  border-bottom: 1px solid #E6EAF4;
+}
+
+#tab-leaderboard table tbody tr:last-child td,
+#tab-leaderboard table tbody tr:last-child td:first-child {
+  border-bottom: none;
+}
+
+/* Zebra striping */
+#tab-leaderboard table tbody tr:nth-child(even),
+#tab-leaderboard table tbody tr:nth-child(even) td {
+  background: #F4F5F9;
+}
+
+:root[data-theme="dark"] #tab-leaderboard table tbody tr td,
+:root[data-theme="dark"] #tab-leaderboard table tbody tr td:first-child {
+  border-bottom-color: var(--border);
+}
+
+:root[data-theme="dark"] #tab-leaderboard table tbody tr:nth-child(even),
+:root[data-theme="dark"] #tab-leaderboard table tbody tr:nth-child(even) td {
+  background: #273038;
+}
+
+/* Center rank column */
+#tab-leaderboard table th:first-child,
+#tab-leaderboard table td:first-child {
+  text-align: center;
+}
+
+/* Remove extra top padding above table */
+#tab-leaderboard .table-wrap {
+  margin-top: 0 !important;
+}
+
+#tab-leaderboard table {
+  margin-top: 0;
+}
+
+/* ---- Leaderboard Card ---- */
+#tab-leaderboard .card {
+  padding-top: 0;
+  overflow: hidden;
+}
+
+#tab-leaderboard .card > .top3-podium {
+  margin-top: 0;
+}
+
+/* ---- PDF CTA Link ---- */
+#tab-leaderboard .leaderboard-pdf-cta {
+  margin-top: 32px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+#tab-leaderboard .leaderboard-pdf-cta .link-btn {
+  display: inline;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--brand);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+#tab-leaderboard .leaderboard-pdf-cta .link-btn:hover {
+  background: none;
+  text-decoration: underline;
+}
+
+#tab-leaderboard .leaderboard-pdf-cta .link-btn:active {
+  opacity: 0.65;
+}
+
+/* ============================================
+   Leaderboard Skeleton (from index_old.html)
+   ============================================ */
+@keyframes skeletonShimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.skel {
+  background: linear-gradient(90deg,
+    rgba(0,0,0,.06) 25%, rgba(0,0,0,.11) 50%, rgba(0,0,0,.06) 75%
+  );
+  background-size: 800px 100%;
+  animation: skeletonShimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+
+:root[data-theme="dark"] .skel {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,.07) 25%, rgba(255,255,255,.13) 50%, rgba(255,255,255,.07) 75%
+  );
+  background-size: 800px 100%;
+  animation: skeletonShimmer 1.4s infinite linear;
+}
+
+/* White skeleton for podium area */
+.skel-w {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,.18) 25%, rgba(255,255,255,.33) 50%, rgba(255,255,255,.18) 75%
+  );
+  background-size: 800px 100%;
+  animation: skeletonShimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+
+.lb-skel-podium-wrap {
+  border-radius: 12px;
+  /* No top gap — should start flush with the card (like the real podium) */
+  margin: 0 0 12px;
+  padding: 14px 14px 12px;
+  overflow: hidden;
+  /* Match loaded podium sizing (incl. border) to avoid layout jumps */
+  border: 1px solid rgba(13,59,117,.18);
+  background: linear-gradient(180deg, #127AC9 0%, #0066B5 100%);
+  margin-left: -12px;
+  margin-right: -12px;
+}
+
+:root[data-theme="dark"] .lb-skel-podium-wrap {
+  border-color: rgba(255,255,255,.10);
+}
+
+.lb-skel-people {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 2px 10px;
+}
+
+.lb-skel-person { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+}
+
+.lb-skel-person.p1 { flex: 1.2; }
+
+.lb-skel-person.p2,
+.lb-skel-person.p3 { flex: 1; }
+
+.lb-skel-person.p2 { transform: translateY(24px); }
+.lb-skel-person.p3 { transform: translateY(40px); }
+
+.lb-skel-avatar { 
+  border-radius: 50%; 
+  flex-shrink: 0; 
+}
+
+.lb-skel-crown { 
+  width: 26px; 
+  height: 26px; 
+  margin-bottom: 4px; 
+}
+
+.lb-skel-name1 { 
+  margin-top: 8px; 
+  /* 14.8px x2 + 8px + 4px ~= 41.6px (matches loaded name block) */
+  height: 14.8px; 
+}
+
+.lb-skel-name2 { 
+  margin-top: 4px; 
+  height: 14.8px; 
+}
+
+.lb-skel-pts { 
+  margin-top: 6px; 
+  /* Loaded points pill is ~30px incl. borders */
+  height: 30px; 
+  border-radius: 999px !important; 
+}
+
+.lb-skel-stands { 
+  display: flex; 
+  align-items: flex-end; 
+  justify-content: space-between; 
+  gap: 10px; 
+  padding: 0 2px 2px; 
+}
+
+.lb-skel-stand { 
+  flex: 1; 
+  border-radius: 4px 4px 0 0; 
+}
+
+.lb-skel-stand.s1 { 
+  flex: 1.2; 
+  height: 104px; 
+}
+
+.lb-skel-stand.s2 { height: 80px; }
+.lb-skel-stand.s3 { height: 64px; }
+
+.lb-skel-table { 
+  padding: 4px 12px 8px; 
+}
+
+.lb-skel-row { 
+  display: flex; 
+  gap: 10px; 
+  align-items: center; 
+  padding: 11px 0; 
+  border-bottom: 1px solid var(--border); 
+}
+
+.lb-skel-row:last-child { 
+  border-bottom: none; 
+}
+
+.lb-skel-cell { 
+  flex-shrink: 0; 
+}
+
+/* ============================================
+   Top 3 Podium (from index_old.html)
+   ============================================ */
+#tab-leaderboard .top3-podium {
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  margin: 0 -12px 0;
+  border: 1px solid rgba(13,59,117,.18);
+  background: radial-gradient(120% 120% at 50% 0%,
+    rgba(255,255,255,.18) 0%,
+    rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, #127AC9 0%, #0066B5 100%);
+}
+
+:root[data-theme="dark"] #tab-leaderboard .top3-podium {
+  border-color: rgba(255,255,255,.10);
+  background: radial-gradient(120% 120% at 50% 0%,
+    rgba(255,255,255,.10) 0%,
+    rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, #127AC9 0%, #0066B5 100%);
+}
+
+#tab-leaderboard .top3-podium::before {
+  content: "";
+  position: absolute;
+  inset: -10% -20%;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.16), rgba(255,255,255,0) 55%),
+    radial-gradient(circle at 80% 35%, rgba(255,255,255,.10), rgba(255,255,255,0) 60%),
+    radial-gradient(circle at 50% 80%, rgba(255,255,255,.06), rgba(255,255,255,0) 55%);
+  pointer-events: none;
+}
+
+#tab-leaderboard .top3-podium__inner {
+  position: relative;
+  padding: 14px 14px 12px;
+}
+
+/* ============================================
+   🐟 Aqua layer — fish + bubbles
+   ============================================ */
+#tab-leaderboard .top3-aqua {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+}
+
+/* Fish swim from one side to the other at a fixed vertical position */
+.aqua-fish {
+  position: absolute;
+  top: var(--y, 50%);
+  font-size: calc(18px * var(--s, 1));
+  line-height: 1;
+  opacity: 0;
+  will-change: translate, opacity;
+}
+
+/* flip=1: left→right — mirror the emoji so head faces right */
+.aqua-fish[style*="--flip:1"] {
+  left: -40px;
+  transform: scaleX(-1);
+}
+
+/* flip=0: right→left — emoji naturally faces left, no mirror needed */
+.aqua-fish[style*="--flip:0"] {
+  left: auto;
+  right: -40px;
+  transform: scaleX(1);
+}
+
+/* Wobble variants — fish assigned via nth-child for organic feel */
+.aqua-fish:nth-child(3n+1) { animation: fishSwimA var(--d, 9s) ease-in-out var(--del, 0s) infinite; }
+.aqua-fish:nth-child(3n+2) { animation: fishSwimA var(--d, 9s) ease-in-out var(--del, 0s) infinite; }
+.aqua-fish:nth-child(3n+3) { animation: fishSwimA var(--d, 9s) ease-in-out var(--del, 0s) infinite; }
+
+/* flip=0 fish swim opposite */
+.aqua-fish[style*="--flip:0"]:nth-child(3n+1) { animation-name: fishSwimLeftA; }
+.aqua-fish[style*="--flip:0"]:nth-child(3n+2) { animation-name: fishSwimLeftB; }
+.aqua-fish[style*="--flip:0"]:nth-child(3n+3) { animation-name: fishSwimLeftC; }
+
+.aqua-fish[style*="--flip:1"]:nth-child(3n+1) { animation-name: fishSwimA; }
+.aqua-fish[style*="--flip:1"]:nth-child(3n+2) { animation-name: fishSwimB; }
+.aqua-fish[style*="--flip:1"]:nth-child(3n+3) { animation-name: fishSwimC; }
+
+/* ---- Right-bound variants (flip:1) ---- */
+@keyframes fishSwimA {
+  0%   { opacity: 0;   translate: 0 0; }
+  8%   { opacity: .75; }
+  20%  { translate: 22vw  -8px; }
+  40%  { translate: 46vw   5px; opacity: .70; }
+  60%  { translate: 68vw  -3px; }
+  80%  { translate: 92vw   6px; opacity: .55; }
+  100% { translate: 115vw  0;   opacity: 0; }
+}
+
+@keyframes fishSwimB {
+  0%   { opacity: 0;   translate: 0 0; }
+  6%   { opacity: .80; }
+  18%  { translate: 18vw   6px; }
+  35%  { translate: 40vw  -10px; opacity: .72; }
+  55%  { translate: 62vw   8px; }
+  78%  { translate: 88vw  -5px; opacity: .50; }
+  100% { translate: 115vw  0;   opacity: 0; }
+}
+
+@keyframes fishSwimC {
+  0%   { opacity: 0;   translate: 0 0; }
+  10%  { opacity: .70; }
+  25%  { translate: 28vw  -4px; }
+  45%  { translate: 52vw   10px; opacity: .65; }
+  65%  { translate: 74vw  -7px; }
+  85%  { translate: 96vw   3px; opacity: .48; }
+  100% { translate: 115vw  0;   opacity: 0; }
+}
+
+/* ---- Left-bound variants (flip:0) ---- */
+@keyframes fishSwimLeftA {
+  0%   { opacity: 0;   translate: 0 0; }
+  8%   { opacity: .75; }
+  20%  { translate: -22vw  -8px; }
+  40%  { translate: -46vw   5px; opacity: .70; }
+  60%  { translate: -68vw  -3px; }
+  80%  { translate: -92vw   6px; opacity: .55; }
+  100% { translate: -115vw  0;   opacity: 0; }
+}
+
+@keyframes fishSwimLeftB {
+  0%   { opacity: 0;   translate: 0 0; }
+  6%   { opacity: .80; }
+  18%  { translate: -18vw   6px; }
+  35%  { translate: -40vw  -10px; opacity: .72; }
+  55%  { translate: -62vw   8px; }
+  78%  { translate: -88vw  -5px; opacity: .50; }
+  100% { translate: -115vw  0;   opacity: 0; }
+}
+
+@keyframes fishSwimLeftC {
+  0%   { opacity: 0;   translate: 0 0; }
+  10%  { opacity: .70; }
+  25%  { translate: -28vw  -4px; }
+  45%  { translate: -52vw   10px; opacity: .65; }
+  65%  { translate: -74vw  -7px; }
+  85%  { translate: -96vw   3px; opacity: .48; }
+  100% { translate: -115vw  0;   opacity: 0; }
+}
+
+/* Bubbles rise from bottom */
+.aqua-bubble {
+  position: absolute;
+  bottom: -12px;
+  left: var(--x, 50%);
+  width:  var(--sz, 7px);
+  height: var(--sz, 7px);
+  border-radius: 999px;
+  background: rgba(255,255,255,.50);
+  border: 1px solid rgba(255,255,255,.65);
+  opacity: 0;
+  animation: bubbleRise var(--d, 5s) ease-in var(--del, 0s) infinite;
+}
+
+@keyframes bubbleRise {
+  0%   { opacity: 0;   transform: translateY(0)     scale(1);    }
+  15%  { opacity: .80; }
+  70%  { opacity: .55; transform: translateY(-160px) scale(1.15); }
+  100% { opacity: 0;   transform: translateY(-220px) scale(1.3);  }
+}
+
+/* Make sure podium content sits above the aqua layer */
+#tab-leaderboard .top3-people,
+#tab-leaderboard .top3-stands {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aqua-fish, .aqua-bubble, .aqua-crab { animation: none !important; opacity: 0 !important; }
+}
+
+/* ============================================
+   🦀 Crab — walks along the bottom continuously
+   ============================================ */
+.aqua-crab {
+  position: absolute;
+  bottom: 2px;
+  left: -32px;
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  animation: crabWalk 60s linear infinite;
+}
+
+/* 60s total: run right (0-5s), wait (5-30s), run left (30-35s), wait (35-60s) */
+@keyframes crabWalk {
+  0%    { left: -32px;            transform: scaleX(1);  opacity: 0; }
+  1%    { left: -32px;            transform: scaleX(1);  opacity: 1; }
+  8%    { left: calc(100% + 8px); transform: scaleX(1);  opacity: 1; }
+  8.5%  { left: calc(100% + 8px); transform: scaleX(1);  opacity: 0; }
+  49.5% { left: calc(100% + 8px); transform: scaleX(-1); opacity: 0; }
+  50%   { left: calc(100% + 8px); transform: scaleX(-1); opacity: 1; }
+  57%   { left: -32px;            transform: scaleX(-1); opacity: 1; }
+  57.5% { left: -32px;            transform: scaleX(-1); opacity: 0; }
+  100%  { left: -32px;            transform: scaleX(1);  opacity: 0; }
+}
+
+/* ============================================
+   Top 3 People Layout
+   ============================================ */
+#tab-leaderboard .top3-people {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 2px 10px;
+}
+
+#tab-leaderboard .top3-person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+#tab-leaderboard .top3-person.place1 { flex: 1.2; }
+#tab-leaderboard .top3-person.place2,
+#tab-leaderboard .top3-person.place3 { flex: 1; }
+
+/* Offset winner blocks to follow podium heights */
+#tab-leaderboard .top3-person.place2 { transform: translateY(24px); }
+#tab-leaderboard .top3-person.place3 { transform: translateY(40px); }
+
+/* ============================================
+   Avatars with Medal Ring Borders
+   ============================================ */
+#tab-leaderboard .top3-avatar {
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: .02em;
+  background: rgba(255,255,255,.92);
+  color: rgba(15,23,42,.92);
+  box-shadow: none;
+  overflow: hidden;
+}
+
+#tab-leaderboard .top3-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#tab-leaderboard .top3-person.place1 .top3-avatar { width: 80px; height: 80px; }
+#tab-leaderboard .top3-person.place2 .top3-avatar { width: 68px; height: 68px; }
+#tab-leaderboard .top3-person.place3 .top3-avatar { width: 56px; height: 56px; }
+
+/* 🥇 Gold — shiny animated ring */
+#tab-leaderboard .top3-person.place1 .top3-avatar {
+  border: 3px solid transparent;
+  box-shadow:
+    0 0 0 3px #FFD700,
+    0 0 0 5px rgba(255,215,0,.30),
+    0 6px 16px rgba(255,180,0,.35);
+  animation: goldRingPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes goldRingPulse {
+  0%,100% { box-shadow: 0 0 0 3px #FFD700, 0 0 0 5px rgba(255,215,0,.30), 0 6px 16px rgba(255,180,0,.35); }
+  50%     { box-shadow: 0 0 0 3px #FFE55C, 0 0 0 8px rgba(255,215,0,.50), 0 6px 22px rgba(255,200,0,.55); }
+}
+
+/* 🥈 Silver */
+#tab-leaderboard .top3-person.place2 .top3-avatar {
+  border: 3px solid transparent;
+  box-shadow:
+    0 0 0 3px #C8D0D8,
+    0 0 0 5px rgba(180,190,200,.22),
+    0 4px 12px rgba(140,155,170,.30);
+}
+
+/* 🥉 Bronze */
+#tab-leaderboard .top3-person.place3 .top3-avatar {
+  border: 3px solid transparent;
+  box-shadow:
+    0 0 0 3px #C8874A,
+    0 0 0 5px rgba(180,110,50,.20),
+    0 4px 10px rgba(160,90,40,.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #tab-leaderboard .top3-person.place1 .top3-avatar { animation: none; }
+}
+
+/* ============================================
+   👑 Crown above 1st place
+   ============================================ */
+#tab-leaderboard .top3-crown {
+  font-size: 26px;
+  line-height: 1;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 2px 6px rgba(255,190,0,.70));
+  animation: crownFloat 2.8s ease-in-out infinite;
+  display: block;
+  text-align: center;
+  cursor: pointer;
+}
+
+@keyframes crownFloat {
+  0%,100% { transform: translateY(0)    scale(1);    filter: drop-shadow(0 2px 6px rgba(255,190,0,.70)); }
+  50%     { transform: translateY(-4px) scale(1.08); filter: drop-shadow(0 5px 12px rgba(255,200,0,.90)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #tab-leaderboard .top3-crown { animation: none; }
+}
+
+/* ============================================
+   🦀 CRAB #3 — long-press on 2nd place avatar
+   ============================================ */
+#tab-leaderboard .top3-person.place2 { position: relative; }
+
+@keyframes avatarShake {
+  0%,100% { transform: translateY(24px) rotate(0); }
+  20%     { transform: translateY(24px) rotate(-6deg); }
+  40%     { transform: translateY(24px) rotate(6deg); }
+  60%     { transform: translateY(24px) rotate(-4deg); }
+  80%     { transform: translateY(24px) rotate(3deg); }
+}
+
+#tab-leaderboard .top3-person.place2.shaking {
+  animation: avatarShake .5s ease-in-out;
+}
+
+.crab-popup {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  font-size: 28px;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
+}
+
+@keyframes crabPopIn {
+  0%   { transform: translateX(-50%) scale(0) translateY(20px); opacity: 0; }
+  40%  { transform: translateX(-50%) scale(1.3) translateY(-10px); opacity: 1; }
+  60%  { transform: translateX(-50%) scale(0.9) translateY(-4px); opacity: 1; }
+  80%  { transform: translateX(-50%) scale(1.05) translateY(-6px); opacity: 1; }
+  100% { transform: translateX(-50%) scale(1) translateY(-8px); opacity: 1; }
+}
+
+@keyframes crabPopOut {
+  0%   { transform: translateX(-50%) scale(1) translateY(-8px); opacity: 1; }
+  100% { transform: translateX(-50%) scale(0) translateY(20px); opacity: 0; }
+}
+
+/* ============================================
+   Name & Points
+   ============================================ */
+#tab-leaderboard .top3-name {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  min-height: calc(1.2em * 2);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-align: center;
+  font-family: var(--font-ui);
+}
+
+#tab-leaderboard .top3-points {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(15,23,42,.92);
+  background: rgba(255,255,255,.90);
+  border: 1px solid rgba(255,255,255,.65);
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+:root[data-theme="dark"] #tab-leaderboard .top3-points {
+  background: rgba(255,255,255,.88);
+  border-color: rgba(255,255,255,.35);
+  box-shadow: none;
+}
+
+/* ============================================
+   Stands (Podium)
+   ============================================ */
+#tab-leaderboard .top3-stands {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 2px 2px;
+}
+
+#tab-leaderboard .top3-stand {
+  position: relative;
+  flex: 1;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  clip-path: polygon(
+    0 14px,
+    14px 0,
+    calc(100% - 14px) 0,
+    100% 14px,
+    100% 100%,
+    0 100%
+  );
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(180deg,
+    #FFB805 0px,
+    #FFB805 12px,
+    #FFD53B 12px,
+    #FFB804 100%
+  );
+  box-shadow: none;
+}
+
+#tab-leaderboard .top3-stand.s1 { flex: 1.2; height: 104px; }
+#tab-leaderboard .top3-stand.s2 { height: 80px; }
+#tab-leaderboard .top3-stand.s3 { height: 64px; }
+
+:root[data-theme="dark"] #tab-leaderboard .top3-stand {
+  background: linear-gradient(180deg,
+    rgba(255,184,5,.96) 0px,
+    rgba(255,184,5,.96) 12px,
+    rgba(255,213,59,.95) 12px,
+    rgba(255,184,4,.92) 100%
+  );
+}
+
+#tab-leaderboard .top3-stand .num {
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -.02em;
+  background: linear-gradient(180deg, #13485B 20%, #22242A 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+#tab-leaderboard .top3-stand.s2 .num { font-size: 40px; }
+#tab-leaderboard .top3-stand.s3 .num { font-size: 34px; }
+
+#tab-leaderboard .top3-stand::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: none;
+  opacity: .85;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 360px) {
+  #tab-leaderboard .top3-avatar { width: 58px; height: 58px; }
+  #tab-leaderboard .top3-name { font-size: 14px; }
+  #tab-leaderboard .top3-points { font-size: 13px; padding: 6px 10px; }
+}
+
+/* ============================================
+   Status Badge
+   ============================================ */
+.lb-status-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 1px 4px rgba(0,0,0,.14);
+  line-height: 1;
+  z-index: 2;
+}
+
+/* ============================================
+   Podium Entrance Animations
+   ============================================ */
+
+/* -- Stands rise up -- */
+.podium-entrance .top3-stand {
+  animation: standRise 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.podium-entrance .top3-stand.s1 { animation-delay: 0.05s; }
+.podium-entrance .top3-stand.s2 { animation-delay: 0.12s; }
+.podium-entrance .top3-stand.s3 { animation-delay: 0.19s; }
+
+@keyframes standRise {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* -- Avatars scale bounce -- */
+.podium-entrance .top3-avatar {
+  animation: avatarEntrance 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.podium-entrance .place1 .top3-avatar { animation-delay: 0.18s; }
+.podium-entrance .place2 .top3-avatar { animation-delay: 0.26s; }
+.podium-entrance .place3 .top3-avatar { animation-delay: 0.34s; }
+
+@keyframes avatarEntrance {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* -- Names fade up -- */
+.podium-entrance .top3-name {
+  animation: nameEntrance 0.35s ease-out both;
+}
+.podium-entrance .place1 .top3-name { animation-delay: 0.32s; }
+.podium-entrance .place2 .top3-name { animation-delay: 0.38s; }
+.podium-entrance .place3 .top3-name { animation-delay: 0.44s; }
+
+@keyframes nameEntrance {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* -- Points pop in -- */
+.podium-entrance .top3-points {
+  animation: pointsEntrance 0.3s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+.podium-entrance .place1 .top3-points { animation-delay: 0.40s; }
+.podium-entrance .place2 .top3-points { animation-delay: 0.46s; }
+.podium-entrance .place3 .top3-points { animation-delay: 0.52s; }
+
+@keyframes pointsEntrance {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* -- Crown drops in -- */
+.podium-entrance .top3-crown,
+#tab-leaderboard .podium-entrance .top3-crown {
+  animation: crownEntrance 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: 0.30s;
+}
+
+@keyframes crownEntrance {
+  from { opacity: 0; transform: translateY(-18px) scale(0.5); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* -- Status badge -- */
+.podium-entrance .lb-status-badge {
+  animation: nameEntrance 0.3s ease-out both;
+  animation-delay: 0.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .podium-entrance .top3-stand,
+  .podium-entrance .top3-avatar,
+  .podium-entrance .top3-name,
+  .podium-entrance .top3-points,
+  .podium-entrance .top3-crown,
+  .podium-entrance .lb-status-badge {
+    animation: none !important;
+  }
+}

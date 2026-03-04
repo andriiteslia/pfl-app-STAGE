@@ -328,7 +328,7 @@ function updatePerchView() {
   const view = cardStates.perch.view;
 
   chevron?.classList.toggle('open', isOpen);
-  if (segment) segment.classList.toggle('seg-hidden', !isOpen);
+  if (segment) segment.style.display = isOpen ? 'flex' : 'none';
 
   if (!isOpen) {
     outResults?.classList.add('table-collapsed');
@@ -405,7 +405,7 @@ function updatePredatorView() {
   const view = cardStates.predator.view;
 
   chevron?.classList.toggle('open', isOpen);
-  if (segment) segment.classList.toggle('seg-hidden', !isOpen);
+  if (segment) segment.style.display = isOpen ? 'flex' : 'none';
 
   if (!isOpen) {
     outPersonal?.classList.add('table-collapsed');

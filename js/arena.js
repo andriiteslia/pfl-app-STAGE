@@ -305,7 +305,7 @@ function renderCard(card) {
   const tagClass = tagClassMap[card.tagClass] || card.tagClass || '';
 
   const segHtml = views.length > 1
-    ? `<div class="segmented-control seg-hidden" id="segArena_${card.id}">
+    ? `<div class="segmented-control" id="segArena_${card.id}" style="display:none;">
         ${views.map(v => `<button class="segment${v.key === activeKey ? ' active' : ''}" type="button" data-view="${v.key}">${escapeHtml(v.label)}</button>`).join('')}
        </div>`
     : '';
@@ -388,7 +388,7 @@ function updateCardView(card) {
   const segment = $(`#segArena_${card.id}`);
 
   chevron?.classList.toggle('open', st.isOpen);
-  if (segment) segment.classList.toggle('seg-hidden', !(st.isOpen && st.views.length > 1));
+  if (segment) segment.style.display = st.isOpen && st.views.length > 1 ? 'flex' : 'none';
 
   st.views.forEach(v => {
     const outEl = $(`#outArena_${v.key}_${card.id}`);

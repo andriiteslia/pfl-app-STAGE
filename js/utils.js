@@ -218,3 +218,25 @@ export async function copyToClipboard(text) {
     }
   }
 }
+
+// ---- Share Card ----
+export const SHARE_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>';
+
+export async function shareCard(deepLink, title) {
+  haptic('medium');
+
+  // Try native Web Share API first
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: title || 'PFL', url: deepLink });
+      return;
+    } catch (e) {
+      // User cancelled or not supported — fallback below
+      if (e.name === 'AbortError') return;
+    }
+  }
+
+  // Fallback: copy to clipboard
+  const ok = await copyToClipboard(deepLink);
+  showToast(ok ? 'Посилання скопійовано ✓' : 'Не вдалося скопіювати');
+}

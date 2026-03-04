@@ -44,6 +44,9 @@ export function initTabs() {
       // Normal switch
       if (tabKey !== activeTab) {
         switchTab(tabKey);
+      } else {
+        // Tap on active tab -> scroll to top
+        scrollToTop();
       }
     });
   });
@@ -190,6 +193,16 @@ export function switchTab(tabKey) {
   
   window.__activeTabKey = tabKey;
   console.log('[Tabs] Switched to:', tabKey);
+}
+
+// ---- Scroll to Top ----
+function scrollToTop() {
+  const scroller = document.getElementById('app-wrap');
+  if (!scroller || scroller.scrollTop === 0) return;
+  
+  haptic('light');
+  scroller.scrollTo({ top: 0, behavior: 'smooth' });
+  bounceIcon(activeTab);
 }
 
 // ---- Bounce Icon ----

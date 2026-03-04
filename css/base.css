@@ -37,7 +37,7 @@ body::after {
   left: 0;
   right: 0;
   bottom: 0;
-  height: var(--tabs-fade-height, 90px);
+  height: var(--tabs-fade-height, 140px);
   pointer-events: none;
   z-index: 99; /* below .tabs (100) */
   background: linear-gradient(
@@ -56,7 +56,7 @@ body::before {
   left: 0;
   right: 0;
   top: 0;
-  height: 48px;
+  height: 96px;
   pointer-events: none;
   z-index: 99;
   opacity: 0;
@@ -91,6 +91,8 @@ body.fullscreen-active::before {
   /* This ensures content is always scrollable for bounce to work */
   min-height: calc(100% + 1px);
   padding: var(--app-top-pad, 20px) 18px 96px;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 /* ---- Global Scrollbar Hiding (except tables) ---- */

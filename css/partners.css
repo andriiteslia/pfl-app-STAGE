@@ -399,7 +399,7 @@ body.partners-details-open::after {
 .fab-back {
   position: fixed;
   bottom: 28px;
-  left: 28px;
+  left: max(28px, calc((100vw - var(--app-max-width)) / 2 + 28px));
   width: 56px;
   height: 56px;
   display: none;

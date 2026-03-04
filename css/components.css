@@ -171,6 +171,15 @@ tr:last-child td {
   border-bottom: 0;
 }
 
+/* Row highlight on tap */
+tbody tr.row-highlight td {
+  background: rgba(18, 122, 201, 0.10);
+}
+
+:root[data-theme="dark"] tbody tr.row-highlight td {
+  background: rgba(78, 163, 255, 0.14);
+}
+
 /* ---- Table Header (collapsible) ---- */
 .table-header {
   display: flex;

@@ -8,6 +8,7 @@
   --tg-viewport-height: 100vh;
   --tg-viewport-stable-height: 100vh;
   --app-top-pad: 20px;
+  --app-max-width: 1280px;
 
   /* ---- Fonts ---- */
   --font-ui: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -51,7 +52,7 @@
   /* ---- Tab Bar Fade ---- */
   --tabs-height: 64px;
   --tabs-offset: 20px;
-  --tabs-fade-extra: 16px;
+  --tabs-fade-extra: 56px;
   --tabs-fade-height: calc(var(--tabs-height) + var(--tabs-offset) + env(safe-area-inset-bottom, 0px) + var(--tabs-fade-extra));
 }
 

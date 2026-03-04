@@ -66,6 +66,7 @@ const CONFIG = {
   // ---- Telegram ----
   TELEGRAM: {
     HAPTIC_ENABLED: true,
+    SHARE_URL_BASE: 'https://t.me/PredatorFestBot/PFL',
   },
 
   // ---- UI Defaults ----

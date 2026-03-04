@@ -4,7 +4,7 @@
    ============================================ */
 
 import CONFIG from './config.js';
-import { initTabs, onTabActivate, getActiveTab } from './tabs.js';
+import { initTabs, onTabActivate, getActiveTab, navigateTo } from './tabs.js';
 import { initFests, loadFestsData, isFestsLoaded } from './fests.js';
 import { initLeaderboard, loadLeaderboard, isLeaderboardLoaded } from './leaderboard.js';
 import { initArena, loadArena, isArenaLoaded } from './arena.js';
@@ -366,7 +366,40 @@ async function init() {
     loadLeaderboard();
   }
   
+  // 8. Deep link via Telegram start_param
+  handleDeepLink();
+  
   console.log('[PFL App] Ready!');
+}
+
+// ---- Deep Link ----
+function handleDeepLink() {
+  try {
+    const tg = window.Telegram?.WebApp;
+    const payload = tg?.initDataUnsafe?.start_param;
+    if (!payload) return;
+    
+    // Format: "tabKey" or "tabKey__cardId"
+    const [tabKey, cardId] = payload.split('__');
+    
+    const validTabs = ['fests', 'leaderboard', 'partners', 'arena', 'didyliv', 'hradivka'];
+    if (!validTabs.includes(tabKey)) {
+      console.warn('[DeepLink] Unknown tab:', tabKey);
+      return;
+    }
+    
+    console.log('[DeepLink] Navigating to:', tabKey, cardId ? `card: ${cardId}` : '');
+    
+    // Navigate to tab
+    navigateTo(tabKey);
+    
+    // If cardId provided, store it for the module to pick up after loading
+    if (cardId) {
+      window.__deepLinkCard = cardId;
+    }
+  } catch (e) {
+    console.warn('[DeepLink] Error:', e);
+  }
 }
 
 // ---- Start ----

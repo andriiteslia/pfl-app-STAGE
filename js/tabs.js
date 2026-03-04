@@ -254,5 +254,25 @@ export function isArenaMode() {
   return arenaMode;
 }
 
+// ---- Deep Link Navigation ----
+export function navigateTo(tabKey) {
+  if (!tabKey || tabKey === activeTab) return;
+  
+  const isArenaTab = arenaTabs.includes(tabKey);
+  const isMainTab = mainTabs.includes(tabKey);
+  
+  if (isArenaTab && !arenaMode) {
+    enterArenaMode(tabKey);
+  } else if (isMainTab && arenaMode) {
+    exitArenaMode();
+    if (tabKey !== 'fests') {
+      // exitArenaMode returns to lastMainTab; override if needed
+      switchTab(tabKey);
+    }
+  } else {
+    switchTab(tabKey);
+  }
+}
+
 // ---- Expose globally ----
 window.__activeTabKey = activeTab;

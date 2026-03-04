@@ -358,7 +358,10 @@ async function init() {
   // 7. Bypass Telegram confirmation modal for external links
   initExternalLinks();
   
-  // 7. Load initial data for visible tab
+  // 8. Row highlight in tables
+  initRowHighlight();
+  
+  // 9. Load initial data for visible tab
   const activeTab = getActiveTab();
   if (activeTab === 'fests') {
     loadFestsData();
@@ -366,7 +369,7 @@ async function init() {
     loadLeaderboard();
   }
   
-  // 8. Deep link via Telegram start_param
+  // 10. Deep link via Telegram start_param
   handleDeepLink();
   
   console.log('[PFL App] Ready!');
@@ -400,6 +403,42 @@ function handleDeepLink() {
   } catch (e) {
     console.warn('[DeepLink] Error:', e);
   }
+}
+
+// ---- Row Highlight ----
+function initRowHighlight() {
+  const content = document.getElementById('app-content');
+  if (!content) return;
+
+  // Tap on row → toggle highlight (one per table)
+  content.addEventListener('click', (e) => {
+    const row = e.target.closest('tbody tr');
+    if (!row) return;
+
+    const tbody = row.closest('tbody');
+    if (!tbody) return;
+
+    const wasActive = row.classList.contains('row-highlight');
+
+    // Clear other highlights in same table
+    tbody.querySelectorAll('tr.row-highlight').forEach(r => r.classList.remove('row-highlight'));
+
+    // Toggle: if it was already active, leave deselected; otherwise select
+    if (!wasActive) {
+      row.classList.add('row-highlight');
+    }
+  });
+
+  // Card header click → clear highlights inside that card
+  content.addEventListener('click', (e) => {
+    const header = e.target.closest('.table-header');
+    if (!header) return;
+
+    const card = header.closest('.card, article');
+    if (!card) return;
+
+    card.querySelectorAll('tr.row-highlight').forEach(r => r.classList.remove('row-highlight'));
+  });
 }
 
 // ---- Start ----

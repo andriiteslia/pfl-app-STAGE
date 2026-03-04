@@ -5,7 +5,7 @@
 
 import CONFIG from './config.js';
 import { fetchSheetData } from './api.js';
-import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers } from './utils.js';
+import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, SHARE_ICON_SVG } from './utils.js';
 
 // ---- State ----
 let tags = [];
@@ -324,10 +324,13 @@ function renderCard(card) {
           ${card.subtitle ? `<div style="font-size:15px; color:var(--muted);">${escapeHtml(card.subtitle)}</div>` : ''}
           ${tagClass && card.tagText ? `<div class="${tagClass}">${escapeHtml(card.tagText)}</div>` : ''}
         </div>
-        <div class="chevron" id="chevronArena_${card.id}">
-          <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 9l6 6 6-6"/>
-          </svg>
+        <div class="table-header__actions">
+          <button class="share-btn" type="button" data-share="arena__${card.id}" aria-label="Share">${SHARE_ICON_SVG}</button>
+          <div class="chevron" id="chevronArena_${card.id}">
+            <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </div>
         </div>
       </div>
       ${segHtml}
@@ -355,6 +358,16 @@ function initCard(card) {
       loadCardData(card, st.view);
     }
   });
+
+  // Share button
+  const shareBtn = header.querySelector('.share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const deepLink = `${CONFIG.TELEGRAM.SHARE_URL_BASE}?startapp=${shareBtn.dataset.share}`;
+      shareCard(deepLink, card.title);
+    });
+  }
 
   if (segment) {
     segment.querySelectorAll('.segment').forEach(btn => {

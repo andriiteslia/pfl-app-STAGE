@@ -3,7 +3,8 @@
    Year switching, fest cards, hardcoded 2025 data
    ============================================ */
 
-import { $, $$, escapeHtml, setButtonLoading, haptic, showToast } from './utils.js';
+import CONFIG from './config.js';
+import { $, $$, escapeHtml, setButtonLoading, haptic, showToast, shareCard } from './utils.js';
 import { mountFests2026, resetFests2026 } from './fests2026.js';
 
 // ---- Hardcoded Data 2025 ----
@@ -297,6 +298,16 @@ function setupPerchCard() {
     }
   });
 
+  // Share button
+  const shareBtn = header.querySelector('.share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const deepLink = `${CONFIG.TELEGRAM.SHARE_URL_BASE}?startapp=${shareBtn.dataset.share}`;
+      shareCard(deepLink, 'PERCH MASTER');
+    });
+  }
+
   if (segment) {
     segment.querySelectorAll('.segment').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -373,6 +384,16 @@ function setupPredatorCard() {
       renderPredatorData();
     }
   });
+
+  // Share button
+  const shareBtn = header.querySelector('.share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const deepLink = `${CONFIG.TELEGRAM.SHARE_URL_BASE}?startapp=${shareBtn.dataset.share}`;
+      shareCard(deepLink, 'PREDATOR CUP 2025');
+    });
+  }
 
   if (segment) {
     segment.querySelectorAll('.segment').forEach(btn => {
@@ -454,6 +475,16 @@ function setupPredator2Card() {
       renderPredator2Data();
     }
   });
+
+  // Share button
+  const shareBtn = header.querySelector('.share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const deepLink = `${CONFIG.TELEGRAM.SHARE_URL_BASE}?startapp=${shareBtn.dataset.share}`;
+      shareCard(deepLink, 'Predator 2025');
+    });
+  }
 }
 
 function renderPredator2Data() {

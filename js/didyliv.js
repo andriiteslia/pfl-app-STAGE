@@ -87,9 +87,10 @@ function setDidylivState(state) {
 
 // ---- Load ABOUT ----
 let aboutLoaded = false;
+let aboutData = null;
 
 async function loadDidylivAbout({ force = false } = {}) {
-  if (aboutLoaded && !force) return;
+  if (aboutLoaded && !force) return aboutData;
 
   try {
     const data = await fetchSheetData({
@@ -98,7 +99,7 @@ async function loadDidylivAbout({ force = false } = {}) {
       range: 'A1:B20',
     }, { force });
 
-    if (!data?.ok || !Array.isArray(data.values)) return;
+    if (!data?.ok || !Array.isArray(data.values)) return null;
 
     // Parse key-value pairs from ABOUT sheet
     const kv = {};
@@ -109,51 +110,60 @@ async function loadDidylivAbout({ force = false } = {}) {
       if (key && val) kv[key] = val;
     });
 
-    const subtitle = $('#subtitle-didyliv');
-    const aboutEl = $('#didylivAbout');
-    const btn1 = $('#didylivBtnPrimary');
-    const btn2 = $('#didylivBtnSecondary');
-
-    const description = kv['description'] || '';
-    const btn1Label = kv['btn1_label'] || '';
-    const btn1Link = kv['btn1_link'] || '';
-    const btn2Label = kv['btn2_label'] || '';
-    const btn2Link = kv['btn2_link'] || '';
-
-    // Description -> subtitle
-    if (subtitle && description) {
-      subtitle.textContent = description;
-    }
-
-    const hasLinks = btn1Label || btn2Label;
-
-    if (btn1 && btn1Label && btn1Link) {
-      btn1.textContent = btn1Label;
-      btn1.href = btn1Link;
-      btn1.style.display = '';
-    }
-
-    if (btn2 && btn2Label && btn2Link) {
-      btn2.textContent = btn2Label;
-      btn2.href = btn2Link;
-      btn2.style.display = '';
-    }
-
-    // Show dot separator only if both links present
-    const dot = $('#didylivAboutDot');
-    if (dot && btn1Label && btn1Link && btn2Label && btn2Link) {
-      dot.style.display = '';
-    }
-
-    if (aboutEl && hasLinks) aboutEl.style.display = '';
-    const dividerEl = $('#didylivDivider');
-    if (dividerEl && hasLinks) dividerEl.style.display = '';
-    aboutLoaded = true;
-
-    console.log('[Didyliv] ABOUT loaded');
+    aboutData = kv;
+    console.log('[Didyliv] ABOUT fetched');
+    return kv;
   } catch (e) {
     console.warn('[Didyliv] ABOUT load error:', e);
+    return null;
   }
+}
+
+function applyAbout(kv) {
+  if (!kv) return;
+
+  const subtitle = $('#subtitle-didyliv');
+  const aboutEl = $('#didylivAbout');
+  const btn1 = $('#didylivBtnPrimary');
+  const btn2 = $('#didylivBtnSecondary');
+
+  const description = kv['description'] || '';
+  const btn1Label = kv['btn1_label'] || '';
+  const btn1Link = kv['btn1_link'] || '';
+  const btn2Label = kv['btn2_label'] || '';
+  const btn2Link = kv['btn2_link'] || '';
+
+  // Description -> subtitle
+  if (subtitle && description) {
+    subtitle.textContent = description;
+  }
+
+  const hasLinks = btn1Label || btn2Label;
+
+  if (btn1 && btn1Label && btn1Link) {
+    btn1.textContent = btn1Label;
+    btn1.href = btn1Link;
+    btn1.style.display = '';
+  }
+
+  if (btn2 && btn2Label && btn2Link) {
+    btn2.textContent = btn2Label;
+    btn2.href = btn2Link;
+    btn2.style.display = '';
+  }
+
+  // Show dot separator only if both links present
+  const dot = $('#didylivAboutDot');
+  if (dot && btn1Label && btn1Link && btn2Label && btn2Link) {
+    dot.style.display = '';
+  }
+
+  if (aboutEl && hasLinks) aboutEl.style.display = '';
+  const dividerEl = $('#didylivDivider');
+  if (dividerEl && hasLinks) dividerEl.style.display = '';
+  aboutLoaded = true;
+
+  console.log('[Didyliv] ABOUT applied');
 }
 
 // ---- Load Config ----
@@ -262,13 +272,14 @@ export async function loadDidyliv({ force = false } = {}) {
   if (force) {
     activeTagId = null;
     aboutLoaded = false;
+    aboutData = null;
   }
 
   setButtonLoading(reloadBtn, true);
   setDidylivState('loading');
 
   try {
-    const [config] = await Promise.all([
+    const [config, aboutKv] = await Promise.all([
       loadDidylivConfig({ force }),
       loadDidylivAbout({ force }),
     ]);
@@ -311,6 +322,7 @@ export async function loadDidyliv({ force = false } = {}) {
 
     renderTags();
     renderCards();
+    applyAbout(aboutKv);
     setDidylivState('content');
     loaded = true;
 

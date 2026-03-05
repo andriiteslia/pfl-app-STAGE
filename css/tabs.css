@@ -75,14 +75,20 @@
 }
 
 /* ============================================
-   ABOUT PILL — always circle, no morph
+   ABOUT PILL — circle, visible only in arena mode
    ============================================ */
 .tabs-about {
-  flex: 0 0 64px;
-  width: 64px;
+  flex: 0 0 0px;
+  width: 0;
   height: 64px;
   padding: 0;
   justify-content: center;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: flex var(--morph-duration) var(--morph-ease),
+              width var(--morph-duration) var(--morph-ease),
+              opacity 0.15s ease;
 }
 
 .tabs-about .tab-btn {
@@ -260,6 +266,15 @@
   transition-delay: 0.05s;
 }
 
+/* About pill -> visible in arena mode */
+.tabs-bar.arena-mode .tabs-about {
+  flex: 0 0 64px;
+  width: 64px;
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0.06s;
+}
+
 /* ---- Staggered delays ---- */
 
 /* Entering arena mode */
@@ -278,6 +293,9 @@
 }
 
 /* Exiting arena mode */
+.tabs-bar:not(.arena-mode) .tabs-about {
+  transition-delay: 0s;
+}
 .tabs-bar:not(.arena-mode) .tabs-solo .tab-btn--venue {
   transition-delay: 0s;
 }

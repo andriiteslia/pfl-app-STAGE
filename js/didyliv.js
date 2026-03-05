@@ -14,6 +14,8 @@ let activeTagId = null;
 const cardState = new Map();
 let loaded = false;
 let isLoading = false;
+let dataReady = false;
+let pendingAbout = null;
 
 // ---- Helpers ----
 function normBool(v) {
@@ -273,6 +275,8 @@ export async function loadDidyliv({ force = false } = {}) {
     activeTagId = null;
     aboutLoaded = false;
     aboutData = null;
+    dataReady = false;
+    pendingAbout = null;
   }
 
   setButtonLoading(reloadBtn, true);
@@ -284,6 +288,7 @@ export async function loadDidyliv({ force = false } = {}) {
       loadDidylivAbout({ force }),
     ]);
 
+    // Store data regardless of active tab
     tags = config.tags;
     cards = config.cards;
 
@@ -310,6 +315,9 @@ export async function loadDidyliv({ force = false } = {}) {
       }
     });
 
+    // Save about data for deferred render
+    pendingAbout = aboutKv;
+
     if (!tags.length) {
       setDidylivState('empty');
       return;
@@ -320,11 +328,14 @@ export async function loadDidyliv({ force = false } = {}) {
       activeTagId = tags[0].id;
     }
 
-    renderTags();
-    renderCards();
-    applyAbout(aboutKv);
-    setDidylivState('content');
-    loaded = true;
+    // If user navigated away, defer render until they come back
+    if (window.__activeTabKey !== 'didyliv') {
+      dataReady = true;
+      console.log('[Didyliv] Data ready, render deferred');
+      return;
+    }
+
+    renderContent(aboutKv);
 
   } catch (e) {
     console.error('[Didyliv] Load error:', e);
@@ -571,6 +582,24 @@ function renderTableInto(values, targetEl, options = {}) {
       </table>
     </div>
   `;
+}
+
+// ---- Render Content (called immediately or deferred) ----
+function renderContent(aboutKv) {
+  renderTags();
+  renderCards();
+  applyAbout(aboutKv);
+  setDidylivState('content');
+  loaded = true;
+  dataReady = false;
+  pendingAbout = null;
+}
+
+// ---- Render deferred content when tab becomes active ----
+export function renderDidylivIfReady() {
+  if (!dataReady || loaded) return;
+  renderContent(pendingAbout);
+  console.log('[Didyliv] Deferred render complete');
 }
 
 // ---- Export ----

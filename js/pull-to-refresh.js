@@ -20,7 +20,6 @@ function getActiveReloadBtn() {
   if (tab === 'fests') return $('#reload');
   if (tab === 'leaderboard') return $('#reloadLeaderboard');
   if (tab === 'arena') return $('#reloadArena');
-  if (tab === 'hradivka') return $('#reloadHradivka');
   if (tab === 'didyliv') return $('#reloadDidyliv');
   return null;
 }
@@ -53,7 +52,7 @@ export function initPullToRefresh() {
 
     // Partners tab has no refresh
     const tab = getActiveTab();
-    if (tab === 'partners') return;
+    if (tab === 'partners' || tab === 'about') return;
 
     if (dy >= THRESHOLD) {
       try {

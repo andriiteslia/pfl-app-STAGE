@@ -378,8 +378,16 @@ async function init() {
 // ---- Deep Link ----
 function handleDeepLink() {
   try {
+    // Try Telegram start_param first, then web URL params
     const tg = window.Telegram?.WebApp;
-    const payload = tg?.initDataUnsafe?.start_param;
+    let payload = tg?.initDataUnsafe?.start_param;
+    
+    if (!payload) {
+      // Web fallback: ?startapp=arena__cardId
+      const urlParams = new URLSearchParams(window.location.search);
+      payload = urlParams.get('startapp');
+    }
+    
     if (!payload) return;
     
     // Format: "tabKey" or "tabKey__cardId"
@@ -399,6 +407,11 @@ function handleDeepLink() {
     // If cardId provided, store it for the module to pick up after loading
     if (cardId) {
       window.__deepLinkCard = cardId;
+    }
+    
+    // Clean URL params without reload
+    if (window.location.search) {
+      window.history.replaceState({}, '', window.location.pathname);
     }
   } catch (e) {
     console.warn('[DeepLink] Error:', e);

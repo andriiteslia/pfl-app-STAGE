@@ -749,13 +749,17 @@
   height: 36px;
   padding: 0;
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   background: var(--card);
-  color: var(--muted);
+  color: #20283A;
   box-shadow: 0 1px 4px rgba(0,0,0,.14);
   cursor: pointer;
   z-index: 2;
   transition: transform var(--transition-fast);
+}
+
+:root[data-theme="dark"] .lb-share-btn {
+  color: #fff;
 }
 
 .lb-share-btn:active {

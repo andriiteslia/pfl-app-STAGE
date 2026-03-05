@@ -457,8 +457,11 @@
 
           <p class="about-text" style="margin-top: var(--spacing-lg);">
             PFL App розроблено на власній ініціативі із любов'ю до риболовлі, спортивного духу, та змагань. Від рибалки-спортсмена, для всіх інших рибалок-друзів, з метою популяризації спорту серед молоді та дорослих.
-          </p> 
-          <p> Маєте цікаві їдеї - пишіть 👇👇👇 </p>.
+          </p>
+
+          <p class="about-text" style="margin-top: var(--spacing-md);">
+            Маєте цікаві ідеї - пишіть 👇👇👇
+          </p>
 
           <div class="about-socials">
             <a class="about-social" href="https://www.instagram.com/andriiteslia/" target="_blank" rel="noopener" aria-label="Instagram">
@@ -472,6 +475,8 @@
             </a>
           </div>
         </article>
+
+      </section>
 
       <!-- ========== DIDYLIV TAB ========== -->
       <section id="tab-didyliv" class="tab-content" aria-label="Didyliv tab">
@@ -557,8 +562,6 @@
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         var badge = document.getElementById('badgeImg');
         if(badge) badge.src = isDark ? 'assets/imgs/badge_dark.png' : 'assets/imgs/badge_light.png';
-        var aboutBadge = document.getElementById('aboutBadgeImg');
-        if(aboutBadge) aboutBadge.src = isDark ? 'assets/imgs/badge_dark.png' : 'assets/imgs/badge_light.png';
         var didylivLogo = document.getElementById('didylivLogo');
         if(didylivLogo) didylivLogo.src = isDark ? './assets/imgs/didyliv_logo_dark.svg' : './assets/imgs/didyliv_logo_light.svg';
       }

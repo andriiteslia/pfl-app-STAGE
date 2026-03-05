@@ -341,7 +341,7 @@ function renderTableInto(values, targetEl, options = {}) {
 
   const colCount = header.length;
   const dividerCols = parseDividers(options.dividers, colCount);
-  const borderStyle = '1px solid var(--border)';
+  const borderStyle = '1px solid #E6EAF4';
 
   const cellStyle = (colIdx) =>
     dividerCols.has(colIdx + 1) ? ` style="border-right:${borderStyle};"` : '';

@@ -15,6 +15,7 @@ let activeTagId = null;
 const cardState = new Map();
 let loaded = false;
 let isLoading = false;
+let dataReady = false;
 
 // ---- Helpers ----
 function normBool(v) {
@@ -185,6 +186,7 @@ export async function loadArena({ force = false } = {}) {
   // Reset active tag on force reload
   if (force) {
     activeTagId = null;
+    dataReady = false;
   }
 
   setButtonLoading(reloadBtn, true);
@@ -229,10 +231,14 @@ export async function loadArena({ force = false } = {}) {
       activeTagId = tags[0].id;
     }
 
-    renderTags();
-    renderCards();
-    setArenaState('content');
-    loaded = true;
+    // If user navigated away, defer render
+    if (window.__activeTabKey !== 'arena') {
+      dataReady = true;
+      console.log('[Arena] Data ready, render deferred');
+      return;
+    }
+
+    renderArenaContent();
 
   } catch (e) {
     console.error('[Arena] Load error:', e);
@@ -479,6 +485,22 @@ function renderTableInto(values, targetEl, options = {}) {
       </table>
     </div>
   `;
+}
+
+// ---- Render Content (called immediately or deferred) ----
+function renderArenaContent() {
+  renderTags();
+  renderCards();
+  setArenaState('content');
+  loaded = true;
+  dataReady = false;
+}
+
+// ---- Render deferred content when tab becomes active ----
+export function renderArenaIfReady() {
+  if (!dataReady || loaded) return;
+  renderArenaContent();
+  console.log('[Arena] Deferred render complete');
 }
 
 // ---- Export ----

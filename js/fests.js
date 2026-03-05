@@ -3,8 +3,7 @@
    Year switching, fest cards, hardcoded 2025 data
    ============================================ */
 
-import CONFIG from './config.js';
-import { $, $$, escapeHtml, setButtonLoading, haptic, showToast, shareCard } from './utils.js';
+import { $, $$, escapeHtml, setButtonLoading, haptic, showToast, shareCard, buildShareLink } from './utils.js';
 import { mountFests2026, resetFests2026 } from './fests2026.js';
 
 // ---- Hardcoded Data 2025 ----
@@ -303,7 +302,7 @@ function setupPerchCard() {
   if (shareBtn) {
     shareBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const deepLink = `${CONFIG.TELEGRAM.SHARE_URL_BASE}?startapp=${shareBtn.dataset.share}`;
+      const deepLink = buildShareLink(shareBtn.dataset.share);
       shareCard(deepLink, 'PERCH MASTER');
     });
   }
@@ -390,7 +389,7 @@ function setupPredatorCard() {
   if (shareBtn) {
     shareBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const deepLink = `${CONFIG.TELEGRAM.SHARE_URL_BASE}?startapp=${shareBtn.dataset.share}`;
+      const deepLink = buildShareLink(shareBtn.dataset.share);
       shareCard(deepLink, 'PREDATOR CUP 2025');
     });
   }
@@ -481,7 +480,7 @@ function setupPredator2Card() {
   if (shareBtn) {
     shareBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const deepLink = `${CONFIG.TELEGRAM.SHARE_URL_BASE}?startapp=${shareBtn.dataset.share}`;
+      const deepLink = buildShareLink(shareBtn.dataset.share);
       shareCard(deepLink, 'Predator 2025');
     });
   }

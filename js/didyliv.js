@@ -3,9 +3,8 @@
    Config-driven venue cards for Ozero Didyliv
    ============================================ */
 
-import CONFIG from './config.js';
 import { fetchSheetData } from './api.js';
-import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, SHARE_ICON_SVG } from './utils.js';
+import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG } from './utils.js';
 
 // ---- State ----
 let tags = [];
@@ -457,7 +456,7 @@ function initCard(card) {
   if (shareBtn) {
     shareBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const deepLink = `${CONFIG.TELEGRAM.SHARE_URL_BASE}?startapp=${shareBtn.dataset.share}`;
+      const deepLink = buildShareLink(shareBtn.dataset.share);
       shareCard(deepLink, card.title);
     });
   }

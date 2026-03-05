@@ -30,7 +30,7 @@ body {
 }
 
 
-/* ---- Bottom Fade (blur + subtle tint behind tab bar) ---- */
+/* ---- Bottom Fade (progressive blur + tint) ---- */
 body::after {
   content: "";
   position: fixed;
@@ -40,17 +40,19 @@ body::after {
   height: 80px;
   pointer-events: none;
   z-index: 99; /* below .tabs (100) */
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   background: linear-gradient(
     to bottom,
     rgba(var(--bg-rgb), 0) 0%,
-    rgba(var(--bg-rgb), 0.4) 50%,
-    rgba(var(--bg-rgb), 0.85) 100%
+    rgba(var(--bg-rgb), 0.3) 40%,
+    rgba(var(--bg-rgb), 0.7) 100%
   );
+  mask-image: linear-gradient(to bottom, transparent 0%, black 50%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 50%);
 }
 
-/* ---- Top Fade (fullscreen mobile only — blur + tint) ---- */
+/* ---- Top Fade (fullscreen — progressive blur + tint) ---- */
 body::before {
   content: "";
   position: fixed;
@@ -61,14 +63,16 @@ body::before {
   pointer-events: none;
   z-index: 99;
   opacity: 0;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   background: linear-gradient(
     to top,
     rgba(var(--bg-rgb), 0) 0%,
-    rgba(var(--bg-rgb), 0.4) 50%,
-    rgba(var(--bg-rgb), 0.85) 100%
+    rgba(var(--bg-rgb), 0.3) 40%,
+    rgba(var(--bg-rgb), 0.7) 100%
   );
+  mask-image: linear-gradient(to top, transparent 0%, black 50%);
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 50%);
   transition: opacity 0.3s ease;
 }
 

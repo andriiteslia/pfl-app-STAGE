@@ -601,7 +601,7 @@ tbody tr.row-highlight td {
 .about-author__photo {
   width: 64px;
   height: 64px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   object-fit: cover;
   flex-shrink: 0;
 }

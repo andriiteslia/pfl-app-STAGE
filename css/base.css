@@ -30,26 +30,29 @@ body {
 }
 
 
-/* ---- Bottom Fade (prevents content behind tab bar from being readable) ---- */
+/* ---- Bottom Fade (blur + subtle tint behind tab bar) ---- */
 body::after {
   content: "";
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 96px;
+  height: 80px;
   pointer-events: none;
   z-index: 99; /* below .tabs (100) */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   background: linear-gradient(
     to bottom,
     rgba(var(--bg-rgb), 0) 0%,
-    rgba(var(--bg-rgb), 0.55) 55%,
-    rgba(var(--bg-rgb), 0.92) 78%,
-    var(--bg) 100%
+    rgba(var(--bg-rgb), 0.35) 60%,
+    rgba(var(--bg-rgb), 0.7) 100%
   );
+  mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
 }
 
-/* ---- Top Fade (fullscreen mobile only — native TG header area) ---- */
+/* ---- Top Fade (fullscreen mobile only — blur + tint) ---- */
 body::before {
   content: "";
   position: fixed;
@@ -60,13 +63,16 @@ body::before {
   pointer-events: none;
   z-index: 99;
   opacity: 0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   background: linear-gradient(
     to top,
     rgba(var(--bg-rgb), 0) 0%,
-    rgba(var(--bg-rgb), 0.55) 45%,
-    rgba(var(--bg-rgb), 0.92) 72%,
-    var(--bg) 100%
+    rgba(var(--bg-rgb), 0.35) 60%,
+    rgba(var(--bg-rgb), 0.7) 100%
   );
+  mask-image: linear-gradient(to top, transparent 0%, black 100%);
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 100%);
   transition: opacity 0.3s ease;
 }
 

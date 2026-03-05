@@ -546,7 +546,7 @@ tbody tr.row-highlight td {
    About Section
    ============================================ */
 .about-card {
-  padding: var(--spacing-md) var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
 }
 
 .about-section-title {
@@ -596,12 +596,25 @@ tbody tr.row-highlight td {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+  position: relative;
+}
+
+.about-author__badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1;
 }
 
 .about-author__photo {
   width: 64px;
   height: 64px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   object-fit: cover;
   flex-shrink: 0;
 }

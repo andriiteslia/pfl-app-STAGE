@@ -738,6 +738,35 @@
   z-index: 2;
 }
 
+.lb-share-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--card);
+  color: var(--muted);
+  box-shadow: 0 1px 4px rgba(0,0,0,.14);
+  cursor: pointer;
+  z-index: 2;
+  transition: transform var(--transition-fast);
+}
+
+.lb-share-btn:active {
+  transform: scale(0.88);
+}
+
+.lb-share-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
 /* ============================================
    Podium Entrance Animations
    ============================================ */
@@ -806,8 +835,9 @@
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* -- Status badge -- */
-.podium-entrance .lb-status-badge {
+/* -- Status badge & share btn -- */
+.podium-entrance .lb-status-badge,
+.podium-entrance .lb-share-btn {
   animation: nameEntrance 0.3s ease-out both;
   animation-delay: 0.5s;
 }
@@ -818,7 +848,8 @@
   .podium-entrance .top3-name,
   .podium-entrance .top3-points,
   .podium-entrance .top3-crown,
-  .podium-entrance .lb-status-badge {
+  .podium-entrance .lb-status-badge,
+  .podium-entrance .lb-share-btn {
     animation: none !important;
   }
 }

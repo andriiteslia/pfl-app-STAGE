@@ -45,11 +45,9 @@ body::after {
   background: linear-gradient(
     to bottom,
     rgba(var(--bg-rgb), 0) 0%,
-    rgba(var(--bg-rgb), 0.35) 60%,
-    rgba(var(--bg-rgb), 0.7) 100%
+    rgba(var(--bg-rgb), 0.4) 50%,
+    rgba(var(--bg-rgb), 0.85) 100%
   );
-  mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
 }
 
 /* ---- Top Fade (fullscreen mobile only — blur + tint) ---- */
@@ -68,11 +66,9 @@ body::before {
   background: linear-gradient(
     to top,
     rgba(var(--bg-rgb), 0) 0%,
-    rgba(var(--bg-rgb), 0.35) 60%,
-    rgba(var(--bg-rgb), 0.7) 100%
+    rgba(var(--bg-rgb), 0.4) 50%,
+    rgba(var(--bg-rgb), 0.85) 100%
   );
-  mask-image: linear-gradient(to top, transparent 0%, black 100%);
-  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 100%);
   transition: opacity 0.3s ease;
 }
 

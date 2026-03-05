@@ -40,8 +40,8 @@ body::after {
   height: 80px;
   pointer-events: none;
   z-index: 99; /* below .tabs (100) */
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   background: linear-gradient(
     to bottom,
     rgba(var(--bg-rgb), 0) 0%,
@@ -63,8 +63,8 @@ body::before {
   pointer-events: none;
   z-index: 99;
   opacity: 0;
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   background: linear-gradient(
     to top,
     rgba(var(--bg-rgb), 0) 0%,

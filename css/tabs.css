@@ -6,7 +6,7 @@
 
 /* ---- Morph timing ---- */
 :root {
-  --morph-duration: 0.24s;
+  --morph-duration: 0.18s;
   --morph-ease: cubic-bezier(0.4, 0, 0.15, 1);
 }
 
@@ -138,7 +138,7 @@
   flex: 1;
   overflow: hidden;
   transition: 
-    flex 0.2s var(--morph-ease),
+    flex 0.15s var(--morph-ease),
     transform var(--transition-fast),
     background var(--transition-fast),
     color var(--transition-fast),
@@ -147,7 +147,7 @@
 
 /* Label crossfade helper */
 .tab-btn--anchor .tab-label {
-  transition: opacity 0.1s ease;
+  transition: opacity 0.08s ease;
 }
 
 /* ============================================
@@ -157,8 +157,8 @@
 .tab-btn--expandable {
   overflow: hidden;
   transition: 
-    flex 0.2s var(--morph-ease),
-    opacity 0.1s ease,
+    flex 0.15s var(--morph-ease),
+    opacity 0.08s ease,
     transform var(--transition-fast),
     background var(--transition-fast),
     color var(--transition-fast),
@@ -167,7 +167,7 @@
 
 .tab-btn--expandable .tab-icon,
 .tab-btn--expandable .tab-label {
-  transition: opacity 0.1s ease;
+  transition: opacity 0.08s ease;
 }
 
 /* ============================================
@@ -180,9 +180,9 @@
   padding: 0;
   overflow: hidden;
   transition: 
-    flex 0.2s var(--morph-ease),
-    width 0.2s var(--morph-ease),
-    opacity 0.1s ease,
+    flex 0.15s var(--morph-ease),
+    width 0.15s var(--morph-ease),
+    opacity 0.08s ease,
     transform var(--transition-fast),
     background var(--transition-fast),
     color var(--transition-fast),
@@ -200,9 +200,9 @@
   overflow: hidden;
   pointer-events: none;
   transition: 
-    flex 0.2s var(--morph-ease),
-    width 0.2s var(--morph-ease),
-    opacity 0.1s ease,
+    flex 0.15s var(--morph-ease),
+    width 0.15s var(--morph-ease),
+    opacity 0.08s ease,
     transform var(--transition-fast),
     background var(--transition-fast),
     color var(--transition-fast),
@@ -212,7 +212,7 @@
 .tabs-solo .tab-btn--venue .tab-icon,
 .tabs-solo .tab-btn--venue .tab-label {
   opacity: 0;
-  transition: opacity 0.1s ease;
+  transition: opacity 0.08s ease;
 }
 
 /* ============================================
@@ -397,7 +397,7 @@
 
 .tab-content.active {
   display: block;
-  animation: tab-slide-in-right 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation: tab-slide-in-right 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 .tab-content.active.slide-left {

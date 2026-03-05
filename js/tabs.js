@@ -36,12 +36,6 @@ export function initTabs() {
         return;
       }
       
-      // Standalone tab (about) clicked in arena mode -> exit arena and go there
-      if (arenaMode && !arenaTabs.includes(tabKey) && !btn.classList.contains('tab-btn--anchor')) {
-        exitArenaMode(tabKey);
-        return;
-      }
-      
       // Arena-group tab from main mode -> enter
       if (!arenaMode && arenaTabs.includes(tabKey)) {
         enterArenaMode(tabKey);
@@ -112,10 +106,13 @@ function enterArenaMode(tabKey) {
 }
 
 // ---- Exit Arena Mode ----
-function exitArenaMode(targetOverride) {
+function exitArenaMode() {
   if (!arenaMode) return;
   
-  lastArenaTab = arenaTabs.includes(activeTab) ? activeTab : 'arena';
+  // Save last arena tab (but not about — save the actual arena/venue tab)
+  if (arenaTabs.includes(activeTab)) {
+    lastArenaTab = activeTab;
+  }
   arenaMode = false;
   haptic('medium');
   
@@ -123,47 +120,25 @@ function exitArenaMode(targetOverride) {
   if (tabsBar) {
     tabsBar.classList.add('morph-exiting');
     tabsBar.classList.remove('arena-mode');
-    // Remove morph-exiting after transition completes
     setTimeout(() => tabsBar.classList.remove('morph-exiting'), 300);
   }
   
   setAnchorLabel('Fests');
   
-  const targetTab = targetOverride || lastMainTab || 'fests';
+  const targetTab = lastMainTab || 'fests';
   previousTab = activeTab;
   activeTab = targetTab;
   
   // Show content immediately
   updateContentPanels(targetTab);
   
-  // Clear arena active states
-  $$('.tabs-solo .tab-btn').forEach(b => b.classList.remove('active'));
+  // Clear arena & about active states
+  $$('.tabs-solo .tab-btn, .tabs-about .tab-btn').forEach(b => b.classList.remove('active'));
   
-  if (mainTabs.includes(targetTab)) {
-    // Returning to a main tab
-    if (targetTab === 'fests') {
-      const anchor = $('.tab-btn--anchor');
-      if (anchor) anchor.classList.add('active');
-    } else {
-      const anchor = $('.tab-btn--anchor');
-      if (anchor) anchor.classList.remove('active');
-      
-      $$('.tab-btn--expandable').forEach(b => {
-        b.classList.add('morph-entering');
-        b.classList.remove('active');
-      });
-      
-      setTimeout(() => {
-        $$('.tab-btn--expandable').forEach(b => b.classList.remove('morph-entering'));
-        const targetBtn = $('.tab-btn[data-tab="' + targetTab + '"]');
-        if (targetBtn) {
-          targetBtn.classList.add('active');
-          bounceIcon(targetTab);
-        }
-      }, 255);
-    }
+  if (targetTab === 'fests') {
+    const anchor = $('.tab-btn--anchor');
+    if (anchor) anchor.classList.add('active');
   } else {
-    // Going to standalone tab (about) — morph main pill back, no main tab active
     const anchor = $('.tab-btn--anchor');
     if (anchor) anchor.classList.remove('active');
     
@@ -174,14 +149,12 @@ function exitArenaMode(targetOverride) {
     
     setTimeout(() => {
       $$('.tab-btn--expandable').forEach(b => b.classList.remove('morph-entering'));
+      const targetBtn = $('.tab-btn[data-tab="' + targetTab + '"]');
+      if (targetBtn) {
+        targetBtn.classList.add('active');
+        bounceIcon(targetTab);
+      }
     }, 255);
-    
-    // Activate the standalone tab button
-    const targetBtn = $('.tab-btn[data-tab="' + targetTab + '"]');
-    if (targetBtn) {
-      targetBtn.classList.add('active');
-      bounceIcon(targetTab);
-    }
   }
   
   const callback = tabCallbacks.get(targetTab);
@@ -302,14 +275,15 @@ export function navigateTo(tabKey) {
   
   if (isArenaTab && !arenaMode) {
     enterArenaMode(tabKey);
+  } else if (tabKey === 'about' && !arenaMode) {
+    // About needs arena mode first
+    enterArenaMode('arena');
+    switchTab(tabKey);
   } else if (isMainTab && arenaMode) {
     exitArenaMode();
     if (tabKey !== 'fests') {
       switchTab(tabKey);
     }
-  } else if (!isArenaTab && !isMainTab && arenaMode) {
-    // Standalone tab (about) from arena mode
-    exitArenaMode(tabKey);
   } else {
     switchTab(tabKey);
   }

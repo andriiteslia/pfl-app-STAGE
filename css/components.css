@@ -590,3 +590,74 @@ tbody tr.row-highlight td {
 .about-link:active {
   transform: scale(0.95);
 }
+
+/* ---- About Author ---- */
+.about-author {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.about-author__photo {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.about-author__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.about-author__role {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.about-author__name {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.about-author__sub {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ---- About Socials ---- */
+.about-socials {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+}
+
+.about-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--brand-bg);
+  transition: transform var(--transition-fast);
+}
+
+.about-social:active {
+  transform: scale(0.90);
+}
+
+.about-social img {
+  width: 24px;
+  height: 24px;
+  display: block;
+}

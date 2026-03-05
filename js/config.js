@@ -69,6 +69,9 @@ const CONFIG = {
     SHARE_URL_BASE: 'https://t.me/predatorfestbot/pfl',
   },
 
+  // ---- Web ----
+  WEB_URL: 'https://predatorfest.netlify.app',
+
   // ---- UI Defaults ----
   UI: {
     DEFAULT_TAB: 'fests',

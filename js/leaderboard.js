@@ -6,7 +6,7 @@
 import { fetchLeaderboard, fetchLeaderboardConfig } from './api.js';
 import { 
   $, escapeHtml, setButtonLoading, formatNameTwoLines, 
-  formatPointsLabel, haptic, showToast 
+  formatPointsLabel, haptic, showToast, shareCard, buildShareLink, SHARE_ICON_SVG
 } from './utils.js';
 
 // ---- State ----
@@ -332,6 +332,15 @@ function renderLeaderboard(values) {
   
   // Connect Easter eggs (crown tap, long-press 2nd place)
   initEasterEggs();
+  
+  // Share button
+  const shareBtn = container.querySelector('.lb-share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', () => {
+      const deepLink = buildShareLink('leaderboard');
+      shareCard(deepLink, 'PFL Leaderboard');
+    });
+  }
 }
 
 // ---- Easter Eggs ----
@@ -429,6 +438,7 @@ function buildTop3Podium(rows, nameIdx, pointsIdx) {
     <div class="top3-podium" aria-label="Top 3 winners podium">
       <div class="top3-podium__inner">
         <div id="lbStatusBadge" class="lb-status-badge" style="display:none;"></div>
+        <button class="lb-share-btn" type="button" aria-label="Share">${SHARE_ICON_SVG}</button>
         
         ${buildAquarium()}
         

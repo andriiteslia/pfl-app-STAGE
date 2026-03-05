@@ -18,7 +18,7 @@
   bottom: 28px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
   z-index: 100;
   padding-bottom: env(safe-area-inset-bottom, 0px);
   max-width: 520px;
@@ -69,6 +69,7 @@
   flex: 0 0 64px;
   height: 64px;
   padding: 0;
+  margin-left: 8px;
   justify-content: center;
   transition: flex var(--morph-duration) var(--morph-ease),
               padding var(--morph-duration) var(--morph-ease);
@@ -88,6 +89,7 @@
   pointer-events: none;
   transition: flex var(--morph-duration) var(--morph-ease),
               width var(--morph-duration) var(--morph-ease),
+              margin var(--morph-duration) var(--morph-ease),
               opacity 0.15s ease;
 }
 
@@ -272,6 +274,7 @@
   width: 64px;
   opacity: 1;
   pointer-events: auto;
+  margin-left: 8px;
   transition-delay: 0.06s;
 }
 

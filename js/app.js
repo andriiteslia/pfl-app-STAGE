@@ -7,8 +7,8 @@ import CONFIG from './config.js';
 import { initTabs, onTabActivate, getActiveTab, navigateTo } from './tabs.js';
 import { initFests, loadFestsData, isFestsLoaded } from './fests.js';
 import { initLeaderboard, loadLeaderboard, isLeaderboardLoaded } from './leaderboard.js';
-import { initArena, loadArena, isArenaLoaded } from './arena.js';
-import { initDidyliv, loadDidyliv, isDidylivLoaded } from './didyliv.js';
+import { initArena, loadArena, isArenaLoaded, renderArenaIfReady } from './arena.js';
+import { initDidyliv, loadDidyliv, isDidylivLoaded, renderDidylivIfReady } from './didyliv.js';
 import { initPartners } from './partners.js';
 import { fetchAppStyles } from './api.js';
 import { $ } from './utils.js';
@@ -315,12 +315,14 @@ function setupTabCallbacks() {
   });
 
   onTabActivate('arena', () => {
+    renderArenaIfReady();
     if (!isArenaLoaded()) {
       loadArena();
     }
   });
 
   onTabActivate('didyliv', () => {
+    renderDidylivIfReady();
     if (!isDidylivLoaded()) {
       loadDidyliv();
     }

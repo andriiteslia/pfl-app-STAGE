@@ -66,7 +66,7 @@ function setAnchorLabel(text) {
     setTimeout(() => {
       label.textContent = text;
       label.style.opacity = '1';
-    }, 85);
+    }, 65);
   }
 }
 
@@ -120,7 +120,7 @@ function exitArenaMode() {
   if (tabsBar) {
     tabsBar.classList.add('morph-exiting');
     tabsBar.classList.remove('arena-mode');
-    setTimeout(() => tabsBar.classList.remove('morph-exiting'), 300);
+    setTimeout(() => tabsBar.classList.remove('morph-exiting'), 220);
   }
   
   setAnchorLabel('Fests');
@@ -154,7 +154,7 @@ function exitArenaMode() {
         targetBtn.classList.add('active');
         bounceIcon(targetTab);
       }
-    }, 255);
+    }, 190);
   }
   
   const callback = tabCallbacks.get(targetTab);

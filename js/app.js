@@ -393,7 +393,7 @@ function handleDeepLink() {
     // Format: "tabKey" or "tabKey__cardId"
     const [tabKey, cardId] = payload.split('__');
     
-    const validTabs = ['fests', 'leaderboard', 'partners', 'arena', 'didyliv', 'hradivka'];
+    const validTabs = ['fests', 'leaderboard', 'partners', 'arena', 'didyliv', 'about'];
     if (!validTabs.includes(tabKey)) {
       console.warn('[DeepLink] Unknown tab:', tabKey);
       return;

@@ -478,24 +478,24 @@ function buildAquarium() {
   // 10 fish with varied movement: speed, depth, size, direction, delay
   // Some swim in pairs (similar y + close delays)
   const fish = [
-    // Deep pair — two friends near the bottom
-    { e:'🐟', d:'14s',  y:'78%', del:'0s',   s:'.80', flip:1 },
-    { e:'🐠', d:'15s',  y:'75%', del:'0.8s', s:'.75', flip:1 },
-    // Mid-water solo cruiser
-    { e:'🐡', d:'18s',  y:'50%', del:'3s',   s:'1.0', flip:0 },
-    // Upper pair — chasing each other
-    { e:'🐟', d:'11s',  y:'22%', del:'1.5s', s:'1.15', flip:0 },
-    { e:'🐠', d:'11.5s',y:'25%', del:'2.2s', s:'1.05', flip:0 },
-    // Fast surface fish
-    { e:'🐟', d:'9s',   y:'12%', del:'5s',   s:'1.25', flip:1 },
-    // Slow deep drifter
-    { e:'🐡', d:'22s',  y:'85%', del:'4s',   s:'.70', flip:0 },
-    // Mid solo
-    { e:'🐠', d:'13s',  y:'42%', del:'7s',   s:'.95', flip:1 },
-    // Another mid trio straggler
-    { e:'🐟', d:'16s',  y:'60%', del:'10s',  s:'.88', flip:1 },
-    // Top loner — big and slow
-    { e:'🐠', d:'20s',  y:'16%', del:'6s',   s:'1.30', flip:0 },
+    // Deep pair — near bottom, leisurely
+    { e:'🐟', d:'16s',  y:'80%', del:'0s',    s:'.78', flip:1 },
+    { e:'🐠', d:'18s',  y:'73%', del:'1.2s',  s:'.72', flip:1 },
+    // Mid-water solo — big slow cruiser
+    { e:'🐡', d:'22s',  y:'48%', del:'3.5s',  s:'1.0', flip:0 },
+    // Upper pair — quick, chasing
+    { e:'🐟', d:'10s',  y:'20%', del:'1.8s',  s:'1.12', flip:0 },
+    { e:'🐠', d:'11s',  y:'26%', del:'2.6s',  s:'1.0',  flip:0 },
+    // Fast surface dart
+    { e:'🐟', d:'8s',   y:'10%', del:'6s',    s:'1.20', flip:1 },
+    // Deep slow drifter
+    { e:'🐡', d:'25s',  y:'88%', del:'4.5s',  s:'.68', flip:0 },
+    // Mid wanderer
+    { e:'🐠', d:'14s',  y:'40%', del:'8s',    s:'.92', flip:1 },
+    // Lower mid — steady
+    { e:'🐟', d:'19s',  y:'62%', del:'11s',   s:'.85', flip:1 },
+    // Top loner — big, very slow
+    { e:'🐠', d:'28s',  y:'15%', del:'7s',    s:'1.28', flip:0 },
   ];
 
   const fishHTML = fish.map(f =>

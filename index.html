@@ -432,28 +432,50 @@
         </div>
       </section>
 
-      <!-- ========== HRADIVKA TAB ========== -->
-      <section id="tab-hradivka" class="tab-content" aria-label="Hradivka tab">
+      <!-- ========== ABOUT TAB ========== -->
+      <section id="tab-about" class="tab-content" aria-label="About tab">
         <header class="fests-header">
           <div class="fests-header__text">
-            <h1 class="page-title">Hradivka Lake 🏕️</h1>
-            <p class="page-subtitle" id="subtitle-hradivka">
-              Рейтинг і результати змагань на Градівці.
+            <h1 class="page-title">About ℹ️</h1>
+            <p class="page-subtitle" id="subtitle-about">
+              Predator Fest League — спільнота рибалок-спортсменів.
             </p>
-          </div>
-          <div class="fests-header__actions">
-            <button class="btn" id="reloadHradivka" type="button">Оновити</button>
           </div>
         </header>
 
-        <div class="fests-year-tags" id="hradivkaTags" style="display: none;"></div>
-        <div id="hradivkaCards" style="display: none;"></div>
-
-        <div class="empty-state" id="hradivkaEmptyState">
-          <img src="./assets/imgs/hradivka.png" alt="Hradivka" width="160" height="160">
-          <p class="empty-state__text" id="hradivkaEmptyText">
-            Зачекайте будь ласка...<br>Завантажую дані Градівки...
+        <article class="card about-card">
+          <h2 class="about-section-title">Про застосунок</h2>
+          <p class="about-text">
+            PFL App — це Telegram WebApp для відстеження результатів змагань, рейтингів та новин Predator Fest League. Всі дані оновлюються в реальному часі.
           </p>
+        </article>
+
+        <article class="card about-card">
+          <h2 class="about-section-title">Автор</h2>
+          <p class="about-text">
+            Створено з ❤️ Андрієм Теслею — організатором та ідеологом Predator Fest League.
+          </p>
+          <div class="about-links">
+            <a class="about-link" href="https://t.me/andriiteslia" target="_blank" rel="noopener">Telegram ✈️</a>
+            <a class="about-link" href="https://www.instagram.com/andrii.teslia/" target="_blank" rel="noopener">Instagram 📸</a>
+          </div>
+        </article>
+
+        <article class="card about-card">
+          <h2 class="about-section-title">Подяка</h2>
+          <p class="about-text">
+            Дизайн та розробка — за допомогою Claude від Anthropic. Мій головний друг у створенні цього застосунку 🤖
+          </p>
+          <div class="about-links">
+            <a class="about-link" href="https://claude.ai" target="_blank" rel="noopener">claude.ai ↗</a>
+          </div>
+        </article>
+
+        <!-- Badge -->
+        <div style="margin-top:24px; margin-bottom:48px; display:flex; justify-content:center; align-items:center; height:40px;">
+          <a href="https://t.me/andriiteslia" target="_blank" rel="noopener noreferrer" style="display:block; height:40px;">
+            <img id="aboutBadgeImg" src="assets/imgs/badge_light.png" alt="badge" style="height:40px; width:auto; display:block;">
+          </a>
         </div>
       </section>
 
@@ -518,9 +540,11 @@
         <span class="tab-icon">🌳</span>
         <span class="tab-label">Didyliv</span>
       </button>
-      <button class="tab-btn tab-btn--venue" data-tab="hradivka" role="tab" aria-selected="false">
-        <span class="tab-icon">🏕️</span>
-        <span class="tab-label">Hradivka</span>
+    </div>
+    <div class="tabs tabs-about">
+      <button class="tab-btn" data-tab="about" role="tab" aria-selected="false">
+        <span class="tab-icon">ℹ️</span>
+        <span class="tab-label">About</span>
       </button>
     </div>
   </nav>
@@ -539,6 +563,8 @@
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         var badge = document.getElementById('badgeImg');
         if(badge) badge.src = isDark ? 'assets/imgs/badge_dark.png' : 'assets/imgs/badge_light.png';
+        var aboutBadge = document.getElementById('aboutBadgeImg');
+        if(aboutBadge) aboutBadge.src = isDark ? 'assets/imgs/badge_dark.png' : 'assets/imgs/badge_light.png';
         var didylivLogo = document.getElementById('didylivLogo');
         if(didylivLogo) didylivLogo.src = isDark ? './assets/imgs/didyliv_logo_dark.svg' : './assets/imgs/didyliv_logo_light.svg';
       }

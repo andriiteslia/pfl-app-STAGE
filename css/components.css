@@ -546,7 +546,7 @@ tbody tr.row-highlight td {
    About Section
    ============================================ */
 .about-card {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-md);
 }
 
 .about-section-title {

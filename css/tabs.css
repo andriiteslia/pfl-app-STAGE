@@ -37,7 +37,7 @@
   backdrop-filter: blur(20px) saturate(1.8);
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
   box-shadow: 
-    0 4px 24px rgba(18, 122, 201, 0.08),
+    0 8px 32px rgba(0, 82, 161, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.90);
   border: 1px solid rgba(255, 255, 255, 0.60);
   overflow: hidden;

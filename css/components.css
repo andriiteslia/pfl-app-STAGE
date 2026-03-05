@@ -629,9 +629,9 @@ tbody tr.row-highlight td {
 }
 
 .about-author__sub {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--muted);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 /* ---- About Socials ---- */

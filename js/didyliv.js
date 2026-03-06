@@ -54,7 +54,7 @@ function setDidylivState(state) {
 
   const DEFAULT_SUB = 'Актуальні результати';
   const LOADING_HTML = `Зачекайте будь ласка,<br>оновлюю дані...`;
-  const EMPTY_HTML = `Поки в розробці,<br>повертайся пізніше...`;
+  const EMPTY_HTML = `Схоже, сезон ще не розпочато,<br>повертайся пізніше...`;
 
   if (state === 'content') {
     if (subtitle && !aboutLoaded) subtitle.textContent = DEFAULT_SUB;
@@ -67,7 +67,19 @@ function setDidylivState(state) {
     return;
   }
 
-  // Show empty/loading state
+  if (state === 'empty') {
+    // No cards but still show about
+    if (emptyEl) emptyEl.style.display = 'flex';
+    if (tagsEl) tagsEl.style.display = 'none';
+    if (cardsEl) cardsEl.style.display = 'none';
+    if (aboutEl && aboutLoaded) aboutEl.style.display = '';
+    if (dividerEl && aboutLoaded) dividerEl.style.display = '';
+    if (tab) tab.classList.add('didyliv-empty');
+    if (emptyText) emptyText.innerHTML = EMPTY_HTML;
+    return;
+  }
+
+  // Show loading/error state — hide everything
   if (emptyEl) emptyEl.style.display = 'flex';
   if (tagsEl) tagsEl.style.display = 'none';
   if (cardsEl) cardsEl.style.display = 'none';
@@ -318,8 +330,12 @@ export async function loadDidyliv({ force = false } = {}) {
     // Save about data for deferred render
     pendingAbout = aboutKv;
 
+    // Apply about data regardless of cards
+    applyAbout(aboutKv);
+
     if (!tags.length) {
       setDidylivState('empty');
+      loaded = true;
       return;
     }
 

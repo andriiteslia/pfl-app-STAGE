@@ -173,7 +173,7 @@ const DATA_2025 = {
 };
 
 // ---- State ----
-let activeYear = '2025';
+let activeYear = '2026';
 
 const cardStates = {
   perch: { isOpen: false, view: 'results' },
@@ -231,7 +231,11 @@ function switchYear(year) {
   }
 
   if (year === '2026') {
-    mountFests2026();
+    const reloadBtn = $('#reload');
+    setButtonLoading(reloadBtn, true);
+    mountFests2026().finally(() => {
+      setButtonLoading(reloadBtn, false);
+    });
   }
 }
 
@@ -277,7 +281,14 @@ async function reloadFests() {
 
 // ---- Load Fests Data ----
 export async function loadFestsData({ force = false } = {}) {
-  console.log('[Fests] Ready (2025 data hardcoded)');
+  if (activeYear === '2026') {
+    const reloadBtn = $('#reload');
+    setButtonLoading(reloadBtn, true);
+    mountFests2026({ force }).finally(() => {
+      setButtonLoading(reloadBtn, false);
+    });
+  }
+  console.log('[Fests] Ready');
 }
 
 // ---- Perch Card ----

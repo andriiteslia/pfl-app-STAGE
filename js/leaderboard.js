@@ -478,24 +478,27 @@ function buildAquarium() {
   // 10 fish with varied movement: speed, depth, size, direction, delay
   // Some swim in pairs (similar y + close delays)
   const fish = [
-    // Deep pair — near bottom, leisurely
-    { e:'🐟', d:'16s',  y:'80%', del:'0s',    s:'.78', flip:1 },
-    { e:'🐠', d:'18s',  y:'73%', del:'1.2s',  s:'.72', flip:1 },
-    // Mid-water solo — big slow cruiser
-    { e:'🐡', d:'22s',  y:'48%', del:'3.5s',  s:'1.0', flip:0 },
-    // Upper pair — quick, chasing
-    { e:'🐟', d:'10s',  y:'20%', del:'1.8s',  s:'1.12', flip:0 },
-    { e:'🐠', d:'11s',  y:'26%', del:'2.6s',  s:'1.0',  flip:0 },
-    // Fast surface dart
-    { e:'🐟', d:'8s',   y:'10%', del:'6s',    s:'1.20', flip:1 },
-    // Deep slow drifter
-    { e:'🐡', d:'25s',  y:'88%', del:'4.5s',  s:'.68', flip:0 },
-    // Mid wanderer
-    { e:'🐠', d:'14s',  y:'40%', del:'8s',    s:'.92', flip:1 },
-    // Lower mid — steady
-    { e:'🐟', d:'19s',  y:'62%', del:'11s',   s:'.85', flip:1 },
-    // Top loner — big, very slow
-    { e:'🐠', d:'28s',  y:'15%', del:'7s',    s:'1.28', flip:0 },
+    // === Pair 1: deep friends, same direction, close Y ===
+    { e:'🐟', d:'16s',  y:'76%', del:'0s',    s:'.78', flip:1 },
+    { e:'🐠', d:'17s',  y:'79%', del:'0.6s',  s:'.74', flip:1 },
+
+    // === Solo: mid-water big cruiser ===
+    { e:'🐡', d:'24s',  y:'45%', del:'4s',    s:'1.0', flip:0 },
+
+    // === Pair 2: upper duo, chasing ===
+    { e:'🐟', d:'12s',  y:'22%', del:'2s',    s:'1.08', flip:0 },
+    { e:'🐠', d:'12.5s',y:'24%', del:'2.8s',  s:'1.0',  flip:0 },
+
+    // === Solo: fast surface dart ===
+    { e:'🐟', d:'9s',   y:'10%', del:'7s',    s:'1.18', flip:1 },
+
+    // === Trio: loose mid-group ===
+    { e:'🐠', d:'15s',  y:'55%', del:'5s',    s:'.90', flip:1 },
+    { e:'🐟', d:'16s',  y:'58%', del:'5.8s',  s:'.85', flip:1 },
+    { e:'🐡', d:'17s',  y:'52%', del:'6.5s',  s:'.82', flip:1 },
+
+    // === Solo: deep slow drifter ===
+    { e:'🐠', d:'28s',  y:'88%', del:'10s',   s:'.68', flip:0 },
   ];
 
   const fishHTML = fish.map(f =>

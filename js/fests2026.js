@@ -11,7 +11,7 @@ import { $, $$, escapeHtml, haptic, parseDividers, shareCard, buildShareLink, SH
 const CONFIG_2026 = {
   SHEET_ID: '1BbRlP6S2OejgiCkQKdoTRqm-przP_qz1Ge17BTmnIbs',
   SHEET_NAME: 'CONFIG_2026',
-  RANGE: 'A1:AE30',
+  RANGE: 'A1:AF30',
 };
 
 // ---- State ----

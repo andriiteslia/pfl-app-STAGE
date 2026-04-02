@@ -233,7 +233,7 @@ function renderCard(fest) {
   const tickerText = fest.ticker;
   const tickerHtml = tickerText
     ? `<div class="card-ticker">
-        <div class="card-ticker__track" style="--ticker-speed: ${Math.max(8, tickerText.length * 0.3)}s;">
+        <div class="card-ticker__track" style="--ticker-speed: ${Math.max(6, tickerText.length * 0.18)}s;">
           <span class="card-ticker__text">${escapeHtml(tickerText)}</span>
           <span class="card-ticker__text">${escapeHtml(tickerText)}</span>
         </div>

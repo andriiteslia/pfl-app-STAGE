@@ -229,17 +229,6 @@ function renderCard(fest) {
        </div>`
     : '';
 
-  // Ticker
-  const tickerText = fest.ticker;
-  const tickerHtml = tickerText
-    ? `<div class="card-ticker">
-        <div class="card-ticker__track" style="--ticker-speed: ${Math.max(6, tickerText.length * 0.18)}s;">
-          <span class="card-ticker__text">${escapeHtml(tickerText)}</span>
-          <span class="card-ticker__text">${escapeHtml(tickerText)}</span>
-        </div>
-       </div>`
-    : '';
-
   return `
     <article class="card" data-fest-id="${fest.id}">
       ${coverHtml}
@@ -262,7 +251,6 @@ function renderCard(fest) {
       ${monoHtml}
       ${segHtml}
       ${outsHtml}
-      ${tickerHtml}
     </article>
   `;
 }

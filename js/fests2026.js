@@ -170,6 +170,7 @@ async function loadConfig2026({ force = false } = {}) {
       cover: normStr(o.cover),
       defaultState: normStr(o.defaultState).toLowerCase() === 'open' ? 'open' : 'closed',
       order: normNum(o.order, 999),
+      ticker: normStr(o.ticker),
     }))
     .filter(o => o.id && o.sheetName);
 
@@ -228,6 +229,17 @@ function renderCard(fest) {
        </div>`
     : '';
 
+  // Ticker
+  const tickerText = fest.ticker;
+  const tickerHtml = tickerText
+    ? `<div class="card-ticker">
+        <div class="card-ticker__track" style="--ticker-speed: ${Math.max(8, tickerText.length * 0.3)}s;">
+          <span class="card-ticker__text">${escapeHtml(tickerText)}</span>
+          <span class="card-ticker__text">${escapeHtml(tickerText)}</span>
+        </div>
+       </div>`
+    : '';
+
   return `
     <article class="card" data-fest-id="${fest.id}">
       ${coverHtml}
@@ -250,6 +262,7 @@ function renderCard(fest) {
       ${monoHtml}
       ${segHtml}
       ${outsHtml}
+      ${tickerHtml}
     </article>
   `;
 }

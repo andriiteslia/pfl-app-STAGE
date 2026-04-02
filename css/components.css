@@ -602,34 +602,6 @@ tbody tr.row-highlight td {
   text-align: center;
 }
 
-/* ---- Card Ticker (scrolling text at bottom of fest cards) ---- */
-.card-ticker {
-  overflow: hidden;
-  white-space: nowrap;
-  margin: var(--spacing-md) calc(-1 * var(--spacing-md)) calc(-1 * var(--spacing-md));
-  height: 20px;
-  display: flex;
-  align-items: center;
-  border-top: 1px solid var(--border);
-}
-
-.card-ticker__track {
-  display: inline-flex;
-  animation: ticker-scroll var(--ticker-speed, 10s) linear infinite;
-}
-
-.card-ticker__text {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--brand);
-  padding: 0 32px;
-}
-
-@keyframes ticker-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
 /* ---- Table Content ---- */
 .table-content {
   margin-top: 12px;

@@ -8,16 +8,16 @@ const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbyCPOHRIiJSqh-0xRVPWnJBPUuj0mtTcjUCRHa1ioT8aKuFO7TKB8Wd1cNr41RxL4gQDQ/exec',
 
   // ---- Cache Settings ----
-  CACHE_TTL_MS: 3 * 60 * 1000, // 3 minutes
+  CACHE_TTL_MS: 2 * 60 * 60 * 1000, // 2 hours
   CACHE_VERSION_KEY: '__pfl_cache_version_v2',
 
   // ---- Google Sheets: Leaderboard ----
   LEADERBOARD: {
     SHEET_ID: '1xUnEaAtgj5rE87LBPfQJeydXj-wI_D4JzwNjwadusao',
-    RESULTS_SHEET: 'LeaderboardResults',
-    RESULTS_RANGE: 'A1:D100',
+    RESULTS_SHEET: 'LeaderboardResults2026',
+    RESULTS_RANGE: 'A1:E200',
     CONFIG_SHEET: 'CONFIG_LB',
-    CONFIG_RANGE: 'A1:B50',
+    CONFIG_RANGE: 'A1:B10',
   },
 
   // ---- Google Sheets: Arena ----

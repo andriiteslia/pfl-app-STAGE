@@ -6,7 +6,7 @@
 /* ---- Leaderboard Table Styles ---- */
 #tab-leaderboard table tbody tr td,
 #tab-leaderboard table tbody tr td:first-child {
-  border-bottom: 1px solid #E6EAF4;
+  border-bottom: 1px solid var(--border);
 }
 
 #tab-leaderboard table tbody tr:last-child td,

@@ -5,13 +5,13 @@
 
 import CONFIG from './config.js';
 import { fetchSheetData } from './api.js';
-import { $, $$, escapeHtml, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG } from './utils.js';
+import { $, $$, escapeHtml, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, yieldToMain } from './utils.js';
 
 // ---- Config ----
 const CONFIG_2026 = {
   SHEET_ID: '1BbRlP6S2OejgiCkQKdoTRqm-przP_qz1Ge17BTmnIbs',
   SHEET_NAME: 'CONFIG_2026',
-  RANGE: 'A1:AA1000',
+  RANGE: 'A1:AE30',
 };
 
 // ---- State ----
@@ -59,11 +59,17 @@ function showLoader(mode = 'loading') {
     container.style.display = 'none';
     container.innerHTML = '';
   }
+
+  const donation = $('#donation2026');
+  if (donation) {
+    donation.style.display = 'none';
+  }
 }
 
 function hideLoader() {
   const loader = $('#yearLoader2026');
   const container = $('#fests2026Container');
+  const donation = $('#donation2026');
 
   if (loader) {
     loader.style.display = 'none';
@@ -71,6 +77,10 @@ function hideLoader() {
 
   if (container) {
     container.style.display = 'block';
+  }
+
+  if (donation) {
+    donation.style.display = '';
   }
 }
 
@@ -154,6 +164,11 @@ async function loadConfig2026({ force = false } = {}) {
       registerBtn: normBool(o.registerBtn) && !!normStr(o.registerBtnLink),
       registerBtnLabel: normStr(o.registerBtnLabel),
       registerBtnLink: normStr(o.registerBtnLink),
+      monoBtn: normBool(o.monoBtn) && !!normStr(o.monoBtnLink),
+      monoBtnLabel: normStr(o.monoBtnLabel),
+      monoBtnLink: normStr(o.monoBtnLink),
+      cover: normStr(o.cover),
+      defaultState: normStr(o.defaultState).toLowerCase() === 'open' ? 'open' : 'closed',
       order: normNum(o.order, 999),
     }))
     .filter(o => o.id && o.sheetName);
@@ -176,16 +191,18 @@ function renderCard(fest) {
   };
   const tagClass = tagClassMap[fest.tagClass] || fest.tagClass || 'score-tag score-tag--personal';
 
+  const isOpen = st?.isOpen || false;
+
   // Segmented control
   const segHtml = views.length > 1
-    ? `<div class="segmented-control" id="seg2026_${fest.id}" style="display:none;">
+    ? `<div class="segmented-control" id="seg2026_${fest.id}" style="display:${isOpen ? 'flex' : 'none'};">
         ${views.map(v => `<button class="segment${v.key === activeKey ? ' active' : ''}" type="button" data-view="${v.key}">${escapeHtml(v.label)}</button>`).join('')}
        </div>`
     : '';
 
   // Output containers
   const outsHtml = views.map(v =>
-    `<div id="out2026_${v.key}_${fest.id}" class="table-content table-collapsed">
+    `<div id="out2026_${v.key}_${fest.id}" class="table-content${isOpen && v.key === activeKey ? '' : ' table-collapsed'}">
       <div class="loading-text">Завантажую дані…</div>
     </div>`
   ).join('');
@@ -197,8 +214,23 @@ function renderCard(fest) {
     ? `<a class="btn register-btn" href="${escapeHtml(regLink)}" target="_blank" rel="noopener">${escapeHtml(fest.registerBtnLabel || 'Зареєструватись')}</a>`
     : '';
 
+  // Mono button
+  const monoLink = fest.monoBtnLink;
+  const monoOk = fest.monoBtn && monoLink && /^(https?:\/\/|tg:\/\/)/i.test(monoLink);
+  const monoHtml = monoOk
+    ? `<a class="btn register-btn register-btn--mono" href="${escapeHtml(monoLink)}" target="_blank" rel="noopener">${escapeHtml(fest.monoBtnLabel || 'Оплатити')}</a>`
+    : '';
+
+  const coverHtml = fest.cover
+    ? `<div class="card-cover">
+        <img class="card-cover__blur" src="./assets/imgs/${escapeHtml(fest.cover)}" alt="" loading="lazy">
+        <img class="card-cover__img" src="./assets/imgs/${escapeHtml(fest.cover)}" alt="" loading="lazy">
+       </div>`
+    : '';
+
   return `
     <article class="card" data-fest-id="${fest.id}">
+      ${coverHtml}
       <div class="table-header" id="header2026_${fest.id}">
         <div class="table-header__text">
           <div class="card-title" style="font-weight:800;">${escapeHtml(fest.title)}</div>
@@ -207,7 +239,7 @@ function renderCard(fest) {
         </div>
         <div class="table-header__actions">
           <button class="share-btn" type="button" data-share="fests__${fest.id}" aria-label="Share">${SHARE_ICON_SVG}</button>
-          <div class="chevron" id="chevron2026_${fest.id}">
+          <div class="chevron${isOpen ? ' open' : ''}" id="chevron2026_${fest.id}">
             <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 9l6 6 6-6"/>
             </svg>
@@ -215,6 +247,7 @@ function renderCard(fest) {
         </div>
       </div>
       ${registerHtml}
+      ${monoHtml}
       ${segHtml}
       ${outsHtml}
     </article>
@@ -317,7 +350,7 @@ async function loadCardData(fest, viewKey, force = false) {
       return;
     }
 
-    renderTableInto(data.values, outEl, { dividers: view.dividers });
+    await renderTableInto(data.values, outEl, { dividers: view.dividers });
     st.loaded[viewKey] = true;
   } catch (e) {
     outEl.innerHTML = '<div class="loading-text">Помилка завантаження.</div>';
@@ -325,7 +358,7 @@ async function loadCardData(fest, viewKey, force = false) {
 }
 
 // ---- Render Table ----
-function renderTableInto(values, targetEl, options = {}) {
+async function renderTableInto(values, targetEl, options = {}) {
   if (!Array.isArray(values) || values.length === 0) {
     targetEl.innerHTML = '<div class="loading-text">Немає даних</div>';
     return;
@@ -339,22 +372,30 @@ function renderTableInto(values, targetEl, options = {}) {
     Array.isArray(r) && r.some(c => String(c ?? '').trim() !== '')
   );
 
-  const colCount = header.length;
+  // Filter empty columns (no header and no data)
+  const colHasData = header.map((h, i) =>
+    String(h ?? '').trim() !== '' || rows.some(r => String(r?.[i] ?? '').trim() !== '')
+  );
+  const activeCols = colHasData.reduce((acc, has, i) => { if (has) acc.push(i); return acc; }, []);
+
+  const colCount = activeCols.length;
   const dividerCols = parseDividers(options.dividers, colCount);
-  const borderStyle = '1px solid #E6EAF4';
+  const borderStyle = '1px solid var(--border)';
 
   const cellStyle = (colIdx) =>
     dividerCols.has(colIdx + 1) ? ` style="border-right:${borderStyle};"` : '';
 
-  const thead = '<tr>' + header.map((h, i) =>
-    `<th${cellStyle(i)}>${escapeHtml(h)}</th>`
+  const thead = '<tr>' + activeCols.map((ci, idx) =>
+    `<th${cellStyle(idx)}>${escapeHtml(header[ci])}</th>`
   ).join('') + '</tr>';
 
   const tbody = rows.map(r =>
-    '<tr>' + (Array.isArray(r) ? r : []).map((c, i) =>
-      `<td${cellStyle(i)}>${escapeHtml(c)}</td>`
+    '<tr>' + activeCols.map((ci, idx) =>
+      `<td${cellStyle(idx)}>${escapeHtml(Array.isArray(r) ? r[ci] : '')}</td>`
     ).join('') + '</tr>'
   ).join('');
+
+  await yieldToMain();
 
   targetEl.innerHTML = `
     <div class="table-wrap" role="region" aria-label="Table">
@@ -404,18 +445,32 @@ export async function mountFests2026({ force = false } = {}) {
         const defView = pickDefaultView(f, views);
         const loaded = {};
         views.forEach(v => { loaded[v.key] = false; });
-        festState.set(f.id, { isOpen: false, view: defView, loaded, views });
+        festState.set(f.id, { isOpen: f.defaultState === 'open', view: defView, loaded, views });
       }
     });
 
     // Render cards
     containerEl.innerHTML = fests2026.map(renderCard).join('');
 
+    await yieldToMain();
+
     // Init interactions
     fests2026.forEach(initCard);
 
+    await yieldToMain();
+
+    // Auto-load data for cards starting open
+    fests2026.forEach(f => {
+      const st = festState.get(f.id);
+      if (st?.isOpen && !st.loaded[st.view]) {
+        loadCardData(f, st.view, force);
+      }
+    });
+
     mounted = true;
     hideLoader();
+    showToast('Оновлено ✓');
+    markUpdated('reload');
 
   } catch (e) {
     console.error('[Fests2026] Mount error:', e);

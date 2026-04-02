@@ -3,10 +3,10 @@
    Top 3 podium, rankings table
    ============================================ */
 
-import { fetchLeaderboard, fetchLeaderboardConfig } from './api.js';
+import { fetchLeaderboard, fetchLeaderboardConfig, clearCache } from './api.js';
 import { 
   $, escapeHtml, setButtonLoading, formatNameTwoLines, 
-  formatPointsLabel, haptic, showToast, shareCard, buildShareLink, SHARE_ICON_SVG
+  formatPointsLabel, haptic, showToast, shareCard, buildShareLink, SHARE_ICON_SVG, markUpdated, yieldToMain
 } from './utils.js';
 
 // ---- State ----
@@ -87,6 +87,8 @@ export async function loadLeaderboard({ force = false } = {}) {
   if (isLoading) return;
   isLoading = true;
   
+  if (force) clearCache();
+  
   // Show loading state
   setButtonLoading(reloadBtn, true);
   
@@ -118,7 +120,7 @@ export async function loadLeaderboard({ force = false } = {}) {
       throw new Error('Invalid data');
     }
     
-    renderLeaderboard(leaderboardData.values);
+    await renderLeaderboard(leaderboardData.values);
     
     if (subtitle) {
       subtitle.textContent = 'Рейтинг учасників Predator Fest League. Головний приз - 23 Shimano Vanquish 2500S!';
@@ -129,6 +131,7 @@ export async function loadLeaderboard({ force = false } = {}) {
     
     if (card) card.classList.add('is-loaded');
     isLoaded = true;
+    markUpdated('reloadLeaderboard');
     
     // Toast on force reload
     if (force) showToast('Оновлено ✓');
@@ -276,7 +279,7 @@ function guessNameIdx(headersLower, colStats, pointsIdx) {
 }
 
 // ---- Render Leaderboard ----
-function renderLeaderboard(values) {
+async function renderLeaderboard(values) {
   const { container } = getElements();
   if (!container) return;
   
@@ -306,18 +309,21 @@ function renderLeaderboard(values) {
     nameIdx = pointsIdx === 0 ? 1 : 0;
   }
   
-  // Build Top 3 podium
+  // Build HTML (CPU work)
   const top3Html = buildTop3Podium(rows, nameIdx, pointsIdx);
-  
-  // Build table
   const tableHtml = buildTable(header, rows);
+
+  await yieldToMain();
   
+  // DOM write
   container.innerHTML = `
     ${top3Html}
     <div class="table-wrap" role="region" aria-label="2026 Leaderboard table">
       ${tableHtml}
     </div>
   `;
+
+  await yieldToMain();
   
   // Re-render status badge (it's inside the podium)
   renderStatusBadge();
@@ -326,7 +332,6 @@ function renderLeaderboard(values) {
   const podium = container.querySelector('.top3-podium');
   if (podium) {
     podium.classList.add('podium-entrance');
-    // Remove class after animations complete so Easter eggs work cleanly
     setTimeout(() => podium.classList.remove('podium-entrance'), 1200);
   }
   

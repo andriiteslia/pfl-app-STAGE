@@ -4,8 +4,8 @@
    ============================================ */
 
 import CONFIG from './config.js';
-import { fetchSheetData } from './api.js';
-import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG } from './utils.js';
+import { fetchSheetData, clearCache } from './api.js';
+import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, yieldToMain } from './utils.js';
 
 // ---- State ----
 let tags = [];
@@ -187,6 +187,7 @@ export async function loadArena({ force = false } = {}) {
   if (force) {
     activeTagId = null;
     dataReady = false;
+    clearCache();
   }
 
   setButtonLoading(reloadBtn, true);
@@ -238,7 +239,7 @@ export async function loadArena({ force = false } = {}) {
       return;
     }
 
-    renderArenaContent();
+    await renderArenaContent();
 
   } catch (e) {
     console.error('[Arena] Load error:', e);
@@ -439,7 +440,7 @@ async function loadCardData(card, viewKey, force = false) {
       return;
     }
 
-    renderTableInto(data.values, outEl, { dividers: view.dividers });
+    await renderTableInto(data.values, outEl, { dividers: view.dividers });
     st.loaded[viewKey] = true;
   } catch (e) {
     outEl.innerHTML = '<div class="loading-text">Помилка завантаження.</div>';
@@ -447,7 +448,7 @@ async function loadCardData(card, viewKey, force = false) {
 }
 
 // ---- Render Table ----
-function renderTableInto(values, targetEl, options = {}) {
+async function renderTableInto(values, targetEl, options = {}) {
   if (!Array.isArray(values) || values.length === 0) {
     targetEl.innerHTML = '<div class="loading-text">Немає даних</div>';
     return;
@@ -460,22 +461,30 @@ function renderTableInto(values, targetEl, options = {}) {
     Array.isArray(r) && r.some(c => String(c ?? '').trim() !== '')
   );
 
-  const colCount = header.length;
+  // Filter empty columns
+  const colHasData = header.map((h, i) =>
+    String(h ?? '').trim() !== '' || rows.some(r => String(r?.[i] ?? '').trim() !== '')
+  );
+  const activeCols = colHasData.reduce((acc, has, i) => { if (has) acc.push(i); return acc; }, []);
+
+  const colCount = activeCols.length;
   const dividerCols = parseDividers(options.dividers, colCount);
-  const borderStyle = '1px solid #E6EAF4';
+  const borderStyle = '1px solid var(--border)';
 
   const cellStyle = (colIdx) =>
     dividerCols.has(colIdx + 1) ? ` style="border-right:${borderStyle};"` : '';
 
-  const thead = '<tr>' + header.map((h, i) =>
-    `<th${cellStyle(i)}>${escapeHtml(h)}</th>`
+  const thead = '<tr>' + activeCols.map((ci, idx) =>
+    `<th${cellStyle(idx)}>${escapeHtml(header[ci])}</th>`
   ).join('') + '</tr>';
 
   const tbody = rows.map((r, rowIdx) =>
-    `<tr class="${rowIdx % 2 === 1 ? 'zebra' : ''}">` + (Array.isArray(r) ? r : []).map((c, i) =>
-      `<td${cellStyle(i)}>${escapeHtml(c)}</td>`
+    `<tr class="${rowIdx % 2 === 1 ? 'zebra' : ''}">` + activeCols.map((ci, idx) =>
+      `<td${cellStyle(idx)}>${escapeHtml(Array.isArray(r) ? r[ci] : '')}</td>`
     ).join('') + '</tr>'
   ).join('');
+
+  await yieldToMain();
 
   targetEl.innerHTML = `
     <div class="table-wrap" role="region" aria-label="Table">
@@ -488,18 +497,22 @@ function renderTableInto(values, targetEl, options = {}) {
 }
 
 // ---- Render Content (called immediately or deferred) ----
-function renderArenaContent() {
+async function renderArenaContent() {
   renderTags();
+  await yieldToMain();
   renderCards();
+  await yieldToMain();
   setArenaState('content');
   loaded = true;
   dataReady = false;
+  showToast('Оновлено ✓');
+  markUpdated('reloadArena');
 }
 
 // ---- Render deferred content when tab becomes active ----
-export function renderArenaIfReady() {
+export async function renderArenaIfReady() {
   if (!dataReady || loaded) return;
-  renderArenaContent();
+  await renderArenaContent();
   console.log('[Arena] Deferred render complete');
 }
 

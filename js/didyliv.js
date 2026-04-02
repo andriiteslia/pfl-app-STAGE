@@ -3,8 +3,8 @@
    Config-driven venue cards for Ozero Didyliv
    ============================================ */
 
-import { fetchSheetData } from './api.js';
-import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG } from './utils.js';
+import { fetchSheetData, clearCache } from './api.js';
+import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, yieldToMain } from './utils.js';
 
 // ---- State ----
 let tags = [];
@@ -289,6 +289,7 @@ export async function loadDidyliv({ force = false } = {}) {
     aboutData = null;
     dataReady = false;
     pendingAbout = null;
+    clearCache();
   }
 
   setButtonLoading(reloadBtn, true);
@@ -336,6 +337,7 @@ export async function loadDidyliv({ force = false } = {}) {
     if (!tags.length) {
       setDidylivState('empty');
       loaded = true;
+      markUpdated('reloadDidyliv');
       return;
     }
 
@@ -351,7 +353,7 @@ export async function loadDidyliv({ force = false } = {}) {
       return;
     }
 
-    renderContent(aboutKv);
+    await renderContent(aboutKv);
 
   } catch (e) {
     console.error('[Didyliv] Load error:', e);
@@ -552,7 +554,7 @@ async function loadCardData(card, viewKey, force = false) {
       return;
     }
 
-    renderTableInto(data.values, outEl, { dividers: view.dividers });
+    await renderTableInto(data.values, outEl, { dividers: view.dividers });
     st.loaded[viewKey] = true;
   } catch (e) {
     outEl.innerHTML = '<div class="loading-text">Помилка завантаження.</div>';
@@ -560,7 +562,7 @@ async function loadCardData(card, viewKey, force = false) {
 }
 
 // ---- Render Table ----
-function renderTableInto(values, targetEl, options = {}) {
+async function renderTableInto(values, targetEl, options = {}) {
   if (!Array.isArray(values) || values.length === 0) {
     targetEl.innerHTML = '<div class="loading-text">Немає даних</div>';
     return;
@@ -573,22 +575,30 @@ function renderTableInto(values, targetEl, options = {}) {
     Array.isArray(r) && r.some(c => String(c ?? '').trim() !== '')
   );
 
-  const colCount = header.length;
+  // Filter empty columns
+  const colHasData = header.map((h, i) =>
+    String(h ?? '').trim() !== '' || rows.some(r => String(r?.[i] ?? '').trim() !== '')
+  );
+  const activeCols = colHasData.reduce((acc, has, i) => { if (has) acc.push(i); return acc; }, []);
+
+  const colCount = activeCols.length;
   const dividerCols = parseDividers(options.dividers, colCount);
-  const borderStyle = '1px solid #E6EAF4';
+  const borderStyle = '1px solid var(--border)';
 
   const cellStyle = (colIdx) =>
     dividerCols.has(colIdx + 1) ? ` style="border-right:${borderStyle};"` : '';
 
-  const thead = '<tr>' + header.map((h, i) =>
-    `<th${cellStyle(i)}>${escapeHtml(h)}</th>`
+  const thead = '<tr>' + activeCols.map((ci, idx) =>
+    `<th${cellStyle(idx)}>${escapeHtml(header[ci])}</th>`
   ).join('') + '</tr>';
 
   const tbody = rows.map((r, rowIdx) =>
-    `<tr class="${rowIdx % 2 === 1 ? 'zebra' : ''}">` + (Array.isArray(r) ? r : []).map((c, i) =>
-      `<td${cellStyle(i)}>${escapeHtml(c)}</td>`
+    `<tr class="${rowIdx % 2 === 1 ? 'zebra' : ''}">` + activeCols.map((ci, idx) =>
+      `<td${cellStyle(idx)}>${escapeHtml(Array.isArray(r) ? r[ci] : '')}</td>`
     ).join('') + '</tr>'
   ).join('');
+
+  await yieldToMain();
 
   targetEl.innerHTML = `
     <div class="table-wrap" role="region" aria-label="Table">
@@ -601,20 +611,24 @@ function renderTableInto(values, targetEl, options = {}) {
 }
 
 // ---- Render Content (called immediately or deferred) ----
-function renderContent(aboutKv) {
+async function renderContent(aboutKv) {
   renderTags();
+  await yieldToMain();
   renderCards();
+  await yieldToMain();
   applyAbout(aboutKv);
   setDidylivState('content');
   loaded = true;
   dataReady = false;
   pendingAbout = null;
+  showToast('Оновлено ✓');
+  markUpdated('reloadDidyliv');
 }
 
 // ---- Render deferred content when tab becomes active ----
-export function renderDidylivIfReady() {
+export async function renderDidylivIfReady() {
   if (!dataReady || loaded) return;
-  renderContent(pendingAbout);
+  await renderContent(pendingAbout);
   console.log('[Didyliv] Deferred render complete');
 }
 

@@ -3,7 +3,8 @@
    Year switching, fest cards, hardcoded 2025 data
    ============================================ */
 
-import { $, $$, escapeHtml, setButtonLoading, haptic, showToast, shareCard, buildShareLink } from './utils.js';
+import { $, $$, escapeHtml, setButtonLoading, haptic, showToast, shareCard, buildShareLink, markUpdated, yieldToMain } from './utils.js';
+import { clearCache } from './api.js';
 import { mountFests2026, resetFests2026 } from './fests2026.js';
 
 // ---- Hardcoded Data 2025 ----
@@ -244,6 +245,7 @@ async function reloadFests() {
   const reloadBtn = $('#reload');
   const subtitle = $('#subtitle-fests');
   
+  clearCache();
   setButtonLoading(reloadBtn, true);
   if (subtitle) subtitle.textContent = 'Оновлюю дані…';
 
@@ -265,11 +267,11 @@ async function reloadFests() {
       
       if (subtitle) subtitle.textContent = 'Результати сезону 2025';
       showToast('Оновлено ✓');
+      markUpdated('reload');
     } else {
       resetFests2026();
       await mountFests2026({ force: true });
       if (subtitle) subtitle.textContent = 'Фести 2026 року';
-      showToast('Оновлено ✓');
     }
   } catch (e) {
     console.error('[Fests] Reload error:', e);
@@ -366,15 +368,15 @@ function updatePerchView() {
   }
 }
 
-function renderPerchData() {
+async function renderPerchData() {
   const view = cardStates.perch.view;
   
   if (view === 'results') {
     const out = $('#outPerchResults');
-    if (out) renderTableInto(DATA_2025.perchResults, out);
+    if (out) await renderTableInto(DATA_2025.perchResults, out);
   } else {
     const out = $('#outPerchTours');
-    if (out) renderTableInto(DATA_2025.perchTours, out);
+    if (out) await renderTableInto(DATA_2025.perchTours, out);
   }
 }
 
@@ -453,15 +455,15 @@ function updatePredatorView() {
   }
 }
 
-function renderPredatorData() {
+async function renderPredatorData() {
   const view = cardStates.predator.view;
   
   if (view === 'personal') {
     const out = $('#outPredatorPersonal');
-    if (out) renderTableInto(DATA_2025.predatorPersonal, out);
+    if (out) await renderTableInto(DATA_2025.predatorPersonal, out);
   } else {
     const out = $('#outPredatorTeam');
-    if (out) renderTableInto(DATA_2025.predatorTeam, out);
+    if (out) await renderTableInto(DATA_2025.predatorTeam, out);
   }
 }
 
@@ -497,26 +499,43 @@ function setupPredator2Card() {
   }
 }
 
-function renderPredator2Data() {
+async function renderPredator2Data() {
   const out = $('#outPredator2');
-  if (out) renderTableInto(DATA_2025.predator2, out);
+  if (out) await renderTableInto(DATA_2025.predator2, out);
 }
 
 // ---- Render Table ----
-function renderTableInto(values, targetEl) {
+async function renderTableInto(values, targetEl) {
   if (!Array.isArray(values) || values.length === 0) {
     targetEl.innerHTML = '<div class="loading-text">Немає даних</div>';
     return;
   }
 
   const header = values[0];
-  const rows = values.slice(1);
+  let rows = values.slice(1);
 
-  const thead = '<tr>' + header.map(h => `<th>${escapeHtml(h)}</th>`).join('') + '</tr>';
+  // Filter empty rows
+  rows = rows.filter(r =>
+    Array.isArray(r) && r.some(c => String(c ?? '').trim() !== '')
+  );
+
+  // Filter empty columns
+  const colHasData = header.map((h, i) =>
+    String(h ?? '').trim() !== '' || rows.some(r => String(r?.[i] ?? '').trim() !== '')
+  );
+  const activeCols = colHasData.reduce((acc, has, i) => { if (has) acc.push(i); return acc; }, []);
+
+  const thead = '<tr>' + activeCols.map(ci =>
+    `<th>${escapeHtml(header[ci])}</th>`
+  ).join('') + '</tr>';
 
   const tbody = rows.map(r =>
-    '<tr>' + r.map(c => `<td>${escapeHtml(c).replace(/\n/g, '<br>')}</td>`).join('') + '</tr>'
+    '<tr>' + activeCols.map(ci =>
+      `<td>${escapeHtml(r?.[ci] ?? '').replace(/\n/g, '<br>')}</td>`
+    ).join('') + '</tr>'
   ).join('');
+
+  await yieldToMain();
 
   targetEl.innerHTML = `
     <div class="table-wrap" role="region" aria-label="Table">

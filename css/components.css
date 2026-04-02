@@ -116,6 +116,50 @@
   font-size: 14px;
 }
 
+/* ---- Card Cover Image ---- */
+.card-cover {
+  position: relative;
+  margin: calc(var(--spacing-sm) * -1) calc(var(--spacing-md) * -1) var(--spacing-sm);
+  height: 100px;
+  overflow: hidden;
+}
+
+/* Blurred background — same image stretched & blurred */
+.card-cover__blur {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(24px) saturate(1.4);
+  transform: scale(1.2);
+  z-index: 0;
+}
+
+.card-cover__img {
+  display: block;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Wide screens — taller cover, image centered with blurred sides */
+@media (min-width: 600px) {
+  .card-cover {
+    height: 160px;
+  }
+
+  .card-cover__img {
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+    object-fit: contain;
+  }
+}
+
 /* ---- Table ---- */
 .table-wrap {
   overflow-x: auto;
@@ -151,7 +195,7 @@ th {
 
 td {
   font-size: var(--table-font-size);
-  border-bottom: 1px solid #E6EAF4;
+  border-bottom: 1px solid var(--border);
 }
 
 :root[data-theme="dark"] td {
@@ -251,8 +295,8 @@ tbody tr.row-highlight td {
 
 .table-content .table-wrap {
   margin-top: 0;
-  border-top: 1px solid #E6EAF4;
-  border-bottom: 1px solid #E6EAF4;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 :root[data-theme="dark"] .table-content .table-wrap {
@@ -473,6 +517,23 @@ tbody tr.row-highlight td {
   flex-shrink: 0;
 }
 
+.btn-updated-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.last-updated {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 16px;
+  margin-top: 6px;
+}
+
 /* ---- Theme Toggle ---- */
 .btn.btn-theme {
   width: 44px;
@@ -523,6 +584,24 @@ tbody tr.row-highlight td {
   margin-top: var(--spacing-md);
 }
 
+.register-btn--mono {
+  background: #000000;
+  margin-top: var(--spacing-sm);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* ---- Donation Info ---- */
+.donation-info {
+  margin-top: 32px;
+  margin-bottom: 32px;
+  font-size: 16px;
+  color: var(--muted);
+  text-align: center;
+}
+
 /* ---- Table Content ---- */
 .table-content {
   margin-top: 12px;
@@ -534,8 +613,8 @@ tbody tr.row-highlight td {
 
 .table-content .table-wrap {
   margin-top: 0;
-  border-top: 1px solid #E6EAF4;
-  border-bottom: 1px solid #E6EAF4;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 :root[data-theme="dark"] .table-content .table-wrap {
@@ -546,7 +625,7 @@ tbody tr.row-highlight td {
    About Section
    ============================================ */
 .about-card {
-  padding: var(--spacing-md) var(--spacing-md);
+  padding: var(--spacing-md);
 }
 
 .about-section-title {
@@ -614,7 +693,7 @@ tbody tr.row-highlight td {
 .about-author__photo {
   width: 64px;
   height: 64px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   object-fit: cover;
   flex-shrink: 0;
 }

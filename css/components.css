@@ -593,44 +593,43 @@ tbody tr.row-highlight td {
     0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-/* ---- Donation Card ---- */
-.donation-card {
-  display: flex;
-  align-items: stretch;
-  overflow: hidden;
-  margin-bottom: var(--spacing-md);
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow);
-}
-
-.donation-card__accent {
-  width: 4px;
-  flex-shrink: 0;
-  background: linear-gradient(180deg, #0057B7 0%, #FFD700 100%);
-}
-
-.donation-card__body {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  gap: 12px;
-}
-
-.donation-card__label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.donation-card__amount {
+/* ---- Donation Info ---- */
+.donation-info {
+  margin-top: 32px;
+  margin-bottom: 32px;
   font-size: 16px;
-  font-weight: 800;
-  color: var(--text);
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ---- Card Ticker (scrolling text at bottom of fest cards) ---- */
+.card-ticker {
+  overflow: hidden;
+  margin: 0 calc(-1 * var(--spacing-md));
+  margin-bottom: calc(-1 * var(--spacing-md));
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  background: var(--brand-bg);
+  mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.card-ticker__track {
+  display: inline-flex;
   white-space: nowrap;
+  animation: ticker-scroll var(--ticker-speed, 14s) linear infinite;
+}
+
+.card-ticker__text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand);
+  padding: 0 24px;
+}
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* ---- Table Content ---- */

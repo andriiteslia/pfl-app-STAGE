@@ -4,7 +4,7 @@
    ============================================ */
 
 import CONFIG from './config.js';
-import { fetchSheetData } from './api.js';
+import { fetchSheetData, fetchSheetDataLive } from './api.js';
 import { $, $$, escapeHtml, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, yieldToMain } from './utils.js';
 
 // ---- Config ----
@@ -119,7 +119,9 @@ function pickDefaultView(fest, views) {
 
 // ---- Load Config ----
 async function loadConfig2026({ force = false } = {}) {
-  const data = await fetchSheetData({
+  // Use liveUpdate=true so the app auto-refreshes if Supabase has newer data
+  const fetchFn = force ? fetchSheetData : fetchSheetDataLive;
+  const data = await fetchFn({
     sheetId: CONFIG_2026.SHEET_ID,
     sheetName: CONFIG_2026.SHEET_NAME,
     range: CONFIG_2026.RANGE,
@@ -170,7 +172,6 @@ async function loadConfig2026({ force = false } = {}) {
       cover: normStr(o.cover),
       defaultState: normStr(o.defaultState).toLowerCase() === 'open' ? 'open' : 'closed',
       order: normNum(o.order, 999),
-      ticker: normStr(o.ticker),
     }))
     .filter(o => o.id && o.sheetName);
 
@@ -485,3 +486,20 @@ export function resetFests2026() {
   festState.clear();
   mounted = false;
 }
+
+// ---- Live Update Listener ----
+// When background fetch detects newer CONFIG_2026 data in Supabase,
+// silently re-mount so users see fresh cards without manual refresh.
+(function () {
+  const CONFIG_CACHE_ID = `${CONFIG_2026.SHEET_ID}__${CONFIG_2026.SHEET_NAME}__${CONFIG_2026.RANGE}`;
+
+  document.addEventListener('pflCacheUpdated', async (e) => {
+    if (e.detail?.cacheId !== CONFIG_CACHE_ID) return;
+    if (!mounted) return;
+
+    console.log('[Fests2026] Live update: newer config detected, re-mounting...');
+    resetFests2026();
+    await mountFests2026({ force: false });
+    showToast('Дані оновлено ✓');
+  });
+}());

@@ -4,7 +4,7 @@
    ============================================ */
 
 import CONFIG from './config.js';
-import { fetchSheetData, clearCache } from './api.js';
+import { fetchSheetData, fetchSheetDataLive, clearCache, buildCacheId } from './api.js';
 import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, yieldToMain } from './utils.js';
 
 // ---- State ----
@@ -69,6 +69,9 @@ function setArenaState(state) {
   if (cardsEl) cardsEl.style.display = 'none';
   if (tab) tab.classList.add('arena-empty');
 
+  const lfrInfo = $('#arenaLfrInfo');
+  if (lfrInfo) lfrInfo.style.display = 'none';
+
   if (state === 'loading') {
     if (subtitle) subtitle.textContent = 'Оновлюю рейтинг і результати…';
     if (emptyText) emptyText.innerHTML = LOADING_HTML;
@@ -83,7 +86,8 @@ function setArenaState(state) {
 
 // ---- Load Config ----
 async function loadArenaConfig({ force = false } = {}) {
-  const data = await fetchSheetData({
+  const fetchFn = force ? fetchSheetData : fetchSheetDataLive;
+  const data = await fetchFn({
     sheetId: CONFIG.ARENA.CONFIG_SHEET_ID,
     sheetName: CONFIG.ARENA.CONFIG_SHEET_NAME,
     range: CONFIG.ARENA.CONFIG_RANGE,
@@ -296,6 +300,9 @@ function renderCards() {
   cardsEl.innerHTML = tagCards.map(renderCard).join('');
 
   tagCards.forEach(initCard);
+
+  const lfrInfo = $('#arenaLfrInfo');
+  if (lfrInfo) lfrInfo.style.display = (activeTagId === 'lfrating') ? '' : 'none';
 }
 
 function renderCard(card) {
@@ -520,3 +527,22 @@ export async function renderArenaIfReady() {
 export function isArenaLoaded() {
   return loaded;
 }
+
+// ---- Live Update Listener ----
+(function () {
+  const CONFIG_CACHE_ID = buildCacheId({
+    sheetId: CONFIG.ARENA.CONFIG_SHEET_ID,
+    sheetName: CONFIG.ARENA.CONFIG_SHEET_NAME,
+    range: CONFIG.ARENA.CONFIG_RANGE,
+  });
+
+  document.addEventListener('pflCacheUpdated', async (e) => {
+    if (e.detail?.cacheId !== CONFIG_CACHE_ID) return;
+    if (!isArenaLoaded()) return;
+
+    console.log('[Arena] Live update: newer config detected, reloading...');
+    loaded = false;
+    await loadArena({ force: false });
+    showToast('Дані оновлено ✓');
+  });
+}());

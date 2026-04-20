@@ -3,7 +3,7 @@
    Config-driven venue cards for Ozero Didyliv
    ============================================ */
 
-import { fetchSheetData, clearCache } from './api.js';
+import { fetchSheetData, fetchSheetDataLive, clearCache, buildCacheId } from './api.js';
 import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, yieldToMain } from './utils.js';
 
 // ---- State ----
@@ -107,7 +107,8 @@ async function loadDidylivAbout({ force = false } = {}) {
   if (aboutLoaded && !force) return aboutData;
 
   try {
-    const data = await fetchSheetData({
+    const fetchFn = force ? fetchSheetData : fetchSheetDataLive;
+    const data = await fetchFn({
       sheetId: '1iYaFcFvCAN0R8Wr2cc6grMCVQG9ggFQ3HuEggvFM3xc',
       sheetName: 'ABOUT_Didyliv',
       range: 'A1:B20',
@@ -182,7 +183,8 @@ function applyAbout(kv) {
 
 // ---- Load Config ----
 async function loadDidylivConfig({ force = false } = {}) {
-  const data = await fetchSheetData({
+  const fetchFn = force ? fetchSheetData : fetchSheetDataLive;
+  const data = await fetchFn({
     sheetId: '1iYaFcFvCAN0R8Wr2cc6grMCVQG9ggFQ3HuEggvFM3xc',
     sheetName: 'CONFIG_Didyliv',
     range: 'A1:Z1000',
@@ -636,3 +638,28 @@ export async function renderDidylivIfReady() {
 export function isDidylivLoaded() {
   return loaded;
 }
+
+// ---- Live Update Listener ----
+(function () {
+  const CONFIG_CACHE_ID = buildCacheId({
+    sheetId: '1iYaFcFvCAN0R8Wr2cc6grMCVQG9ggFQ3HuEggvFM3xc',
+    sheetName: 'CONFIG_Didyliv',
+    range: 'A1:Z1000',
+  });
+  const ABOUT_CACHE_ID = buildCacheId({
+    sheetId: '1iYaFcFvCAN0R8Wr2cc6grMCVQG9ggFQ3HuEggvFM3xc',
+    sheetName: 'ABOUT_Didyliv',
+    range: 'A1:B20',
+  });
+
+  document.addEventListener('pflCacheUpdated', async (e) => {
+    const cid = e.detail?.cacheId;
+    if (cid !== CONFIG_CACHE_ID && cid !== ABOUT_CACHE_ID) return;
+    if (!isDidylivLoaded()) return;
+
+    console.log('[Didyliv] Live update: newer data detected, reloading...');
+    loaded = false;
+    await loadDidyliv({ force: false });
+    showToast('Дані оновлено ✓');
+  });
+}());

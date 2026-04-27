@@ -343,7 +343,8 @@ async function loadCardData(fest, viewKey, force = false) {
   outEl.innerHTML = '<div class="loading-text">Завантажую дані…</div>';
 
   try {
-    const data = await fetchSheetData({
+    const fetchFn = force ? fetchSheetData : fetchSheetDataLive;
+    const data = await fetchFn({
       sheetId: fest.sheetId,
       sheetName: fest.sheetName,
       range: view.range,
@@ -498,12 +499,32 @@ export function resetFests2026() {
   const CONFIG_CACHE_ID = `${CONFIG_2026.SHEET_ID}__${CONFIG_2026.SHEET_NAME}__${CONFIG_2026.RANGE}`;
 
   document.addEventListener('pflCacheUpdated', async (e) => {
-    if (e.detail?.cacheId !== CONFIG_CACHE_ID) return;
     if (!mounted) return;
+    const cid = e.detail?.cacheId;
 
-    console.log('[Fests2026] Live update: newer config detected, re-mounting...');
-    resetFests2026();
-    await mountFests2026({ force: false });
+    if (cid === CONFIG_CACHE_ID) {
+      // CONFIG changed — full re-mount
+      console.log('[Fests2026] Live update: config changed, re-mounting...');
+      resetFests2026();
+      await mountFests2026({ force: false });
+    } else {
+      // Card data changed — find and re-render the affected card view
+      const affectedFest = fests2026.find(f => {
+        const st = festState.get(f.id);
+        if (!st) return false;
+        return st.views.some(v => {
+          const id = `${f.sheetId}__${f.sheetName}__${v.range}`;
+          return id === cid;
+        });
+      });
+      if (!affectedFest) return;
+      const st = festState.get(affectedFest.id);
+      if (st?.isOpen) {
+        console.log('[Fests2026] Live update: card data changed for', affectedFest.id);
+        await loadCardData(affectedFest, st.view, false);
+      }
+    }
+
     showToast('Дані оновлено ✓');
     markUpdated('reload');
   });

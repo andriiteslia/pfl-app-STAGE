@@ -84,12 +84,12 @@ function setArenaState(state) {
 }
 
 // ---- Load Config ----
-async function loadArenaConfig({ force = false } = {}) {
+async function loadArenaConfig({ force = false, liveUpdate = false } = {}) {
   const data = await fetchSheetData({
     sheetId: CONFIG.ARENA.CONFIG_SHEET_ID,
     sheetName: CONFIG.ARENA.CONFIG_SHEET_NAME,
     range: CONFIG.ARENA.CONFIG_RANGE,
-  }, { force });
+  }, { force, liveUpdate });
 
   if (!data?.ok || !Array.isArray(data.values) || data.values.length < 2) {
     return { tags: [], cards: [], updatedAt: null };
@@ -198,7 +198,7 @@ export async function loadArena({ force = false } = {}) {
   setArenaState('loading');
 
   try {
-    const config = await loadArenaConfig({ force });
+    const config = await loadArenaConfig({ force, liveUpdate: !force });
 
     tags = config.tags;
     cards = config.cards;

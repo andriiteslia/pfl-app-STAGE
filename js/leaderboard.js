@@ -116,8 +116,8 @@ export async function loadLeaderboard({ force = false } = {}) {
   try {
     // Load config and data in parallel
     const [configData, leaderboardData] = await Promise.all([
-      fetchLeaderboardConfig({ force }),
-      fetchLeaderboard({ force }),
+      fetchLeaderboardConfig({ force, liveUpdate: !force }),
+      fetchLeaderboard({ force, liveUpdate: !force }),
     ]);
     
     // Parse config

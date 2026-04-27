@@ -188,11 +188,12 @@ function timeAgo(ts) {
   return `${days} д тому`;
 }
 
-export function markUpdated(btnId) {
+export function markUpdated(btnId, updatedAt) {
   const btn = document.getElementById(btnId);
   if (!btn) return;
 
-  const now = Date.now();
+  const rawTs = updatedAt ? new Date(updatedAt).getTime() : NaN;
+  const now = (rawTs && !isNaN(rawTs)) ? rawTs : Date.now();
   updatedTimestamps.set(btnId, now);
 
   // Wrap button if not already wrapped

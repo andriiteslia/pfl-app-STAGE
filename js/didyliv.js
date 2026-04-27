@@ -15,6 +15,8 @@ const cardState = new Map();
 let loaded = false;
 let isLoading = false;
 let dataReady = false;
+let _didylivUpdatedAt = null;
+let _didylivForce = false;
 let pendingAbout = null;
 
 // ---- Helpers ----
@@ -191,7 +193,7 @@ async function loadDidylivConfig({ force = false } = {}) {
   }, { force });
 
   if (!data?.ok || !Array.isArray(data.values) || data.values.length < 2) {
-    return { tags: [], cards: [] };
+    return { tags: [], cards: [], updatedAt: null };
   }
 
   const [headerRow, ...rows] = data.values;
@@ -273,7 +275,7 @@ async function loadDidylivConfig({ force = false } = {}) {
     (a.order - b.order) || a.title.localeCompare(b.title, 'uk')
   );
 
-  return { tags: sortedTags, cards: parsedCards };
+  return { tags: sortedTags, cards: parsedCards, updatedAt: data.updated_at || null };
 }
 
 // ---- Load Didyliv ----
@@ -306,6 +308,8 @@ export async function loadDidyliv({ force = false } = {}) {
     // Store data regardless of active tab
     tags = config.tags;
     cards = config.cards;
+    _didylivUpdatedAt = config.updatedAt;
+    _didylivForce = force;
 
     // Group cards by tag
     cardsByTag.clear();
@@ -339,7 +343,7 @@ export async function loadDidyliv({ force = false } = {}) {
     if (!tags.length) {
       setDidylivState('empty');
       loaded = true;
-      markUpdated('reloadDidyliv');
+      markUpdated('reloadDidyliv', _didylivForce ? undefined : _didylivUpdatedAt);
       return;
     }
 
@@ -624,7 +628,7 @@ async function renderContent(aboutKv) {
   dataReady = false;
   pendingAbout = null;
   showToast('Оновлено ✓');
-  markUpdated('reloadDidyliv');
+  markUpdated('reloadDidyliv', _didylivForce ? undefined : _didylivUpdatedAt);
 }
 
 // ---- Render deferred content when tab becomes active ----

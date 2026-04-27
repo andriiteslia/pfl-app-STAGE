@@ -115,28 +115,19 @@ async function fetchFromSupabase(cacheId, timeout = 12000) {
 }
 
 // ---- Background Fetch with Live Update ----
-// Fetches from Supabase in background. If data is newer than cache (by updated_at),
-// saves to cache and dispatches 'pflCacheUpdated' event so UI can re-render.
 function startBackgroundFetch(cacheId, cacheKey, versionSnapshot, timeout) {
   fetchFromSupabase(cacheId, timeout).then(json => {
     if (!json?.ok) return;
-
-    // If clearCache() was called while fetch was in-flight — discard result
     if (cacheVersion !== versionSnapshot) {
       console.log('[API] Background fetch discarded — cache version changed');
       return;
     }
-
     const existingUpdatedAt = getFromCache(cacheKey)?.data?.updated_at;
     const isNewer = !existingUpdatedAt || json.updated_at > existingUpdatedAt;
-
     setToCache(cacheKey, json);
-
     if (isNewer) {
       console.log('[API] Background fetch: newer data found, dispatching update event');
-      document.dispatchEvent(new CustomEvent('pflCacheUpdated', {
-        detail: { cacheId }
-      }));
+      document.dispatchEvent(new CustomEvent('pflCacheUpdated', { detail: { cacheId } }));
     } else {
       console.log('[API] Background fetch: data unchanged');
     }
@@ -148,7 +139,7 @@ async function fetchWithSWR(cacheId, { force = false, liveUpdate = false, timeou
   const cacheKey = makeCacheKey(cacheId);
   const cached = getFromCache(cacheKey);
 
-  // 1. Fresh cache → return immediately; optionally background-fetch for live updates
+  // 1. Fresh cache → return immediately
   if (!force && cached?.fresh) {
     console.log('[API] Cache hit (fresh):', cacheId.substring(0, 40) + '...');
     if (liveUpdate) {
@@ -196,37 +187,33 @@ export async function fetchSheetData(params, options = {}) {
   return fetchWithSWR(cacheId, options);
 }
 
-// Same as fetchSheetData but always background-fetches and fires pflCacheUpdated if data changed
 export async function fetchSheetDataLive(params, options = {}) {
   const cacheId = buildCacheId(params);
   return fetchWithSWR(cacheId, { ...options, liveUpdate: true });
 }
 
 export async function fetchLeaderboard(options = {}) {
-  const params = {
+  return fetchSheetData({
     sheetId: CONFIG.LEADERBOARD.SHEET_ID,
     sheetName: CONFIG.LEADERBOARD.RESULTS_SHEET,
     range: CONFIG.LEADERBOARD.RESULTS_RANGE,
-  };
-  return options.liveUpdate ? fetchSheetDataLive(params, options) : fetchSheetData(params, options);
+  }, options);
 }
 
 export async function fetchLeaderboardConfig(options = {}) {
-  const params = {
+  return fetchSheetData({
     sheetId: CONFIG.LEADERBOARD.SHEET_ID,
     sheetName: CONFIG.LEADERBOARD.CONFIG_SHEET,
     range: CONFIG.LEADERBOARD.CONFIG_RANGE,
-  };
-  return options.liveUpdate ? fetchSheetDataLive(params, options) : fetchSheetData(params, options);
+  }, options);
 }
 
 export async function fetchArenaConfig(options = {}) {
-  const params = {
+  return fetchSheetData({
     sheetId: CONFIG.ARENA.CONFIG_SHEET_ID,
     sheetName: CONFIG.ARENA.CONFIG_SHEET_NAME,
     range: CONFIG.ARENA.CONFIG_RANGE,
-  };
-  return options.liveUpdate ? fetchSheetDataLive(params, options) : fetchSheetData(params, options);
+  }, options);
 }
 
 export async function fetchAppStyles(options = {}) {
@@ -239,8 +226,14 @@ export async function fetchAppStyles(options = {}) {
 
 // ---- Cache Management ----
 export function clearCache() {
+  // Delete all cache entries so stale data is never returned after reload.
+  // Simply bumping the version causes stale-path fallback which shows old data.
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('pfl_cache::'));
+    keys.forEach(k => localStorage.removeItem(k));
+    console.log('[Cache] Cleared', keys.length, 'entries');
+  } catch (e) {}
   bumpCacheVersion();
-  console.log('[Cache] Version bumped to:', cacheVersion);
 }
 
 export function hasCachedData(params) {

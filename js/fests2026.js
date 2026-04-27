@@ -18,6 +18,7 @@ const CONFIG_2026 = {
 let fests2026 = [];
 const festState = new Map();
 let mounted = false;
+let _festConfigUpdatedAt = null;
 
 // ---- Helpers ----
 function normBool(v) {
@@ -176,6 +177,7 @@ async function loadConfig2026({ force = false } = {}) {
     .filter(o => o.id && o.sheetName);
 
   fests.sort((a, b) => (a.order - b.order) || a.id.localeCompare(b.id));
+  _festConfigUpdatedAt = data.updated_at || null;
   return fests;
 }
 
@@ -471,8 +473,8 @@ export async function mountFests2026({ force = false } = {}) {
 
     mounted = true;
     hideLoader();
-    showToast('Оновлено ✓');
-    markUpdated('reload');
+    if (force) showToast('Оновлено ✓');
+    markUpdated('reload', force ? undefined : _festConfigUpdatedAt);
 
   } catch (e) {
     console.error('[Fests2026] Mount error:', e);

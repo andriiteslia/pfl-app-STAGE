@@ -195,6 +195,14 @@ export function markUpdated(btnId, updatedAt) {
   const rawTs = updatedAt ? new Date(updatedAt).getTime() : NaN;
   const now = (rawTs && !isNaN(rawTs)) ? rawTs : Date.now();
 
+  // Never overwrite a newer persisted timestamp with an older one.
+  // Example: user force-reloaded 5 min ago (saved), then app re-opens and
+  // markUpdated is called with Supabase updated_at = 45 min ago — must keep 5 min.
+  try {
+    const saved = parseInt(localStorage.getItem('pfl_ts::' + btnId) || '0', 10);
+    if (Number.isFinite(saved) && saved > now) return;
+  } catch(e) {}
+
   // Persist timestamp so next session restores correct label
   try { localStorage.setItem('pfl_ts::' + btnId, String(now)); } catch(e) {}
 

@@ -550,7 +550,8 @@ async function loadCardData(card, viewKey, force = false) {
   outEl.innerHTML = '<div class="loading-text">Завантажую дані…</div>';
 
   try {
-    const data = await fetchSheetData({
+    const fetchFn = force ? fetchSheetData : fetchSheetDataLive;
+    const data = await fetchFn({
       sheetId: card.sheetId,
       sheetName: card.sheetName,
       range: view.range,
@@ -659,12 +660,31 @@ export function isDidylivLoaded() {
 
   document.addEventListener('pflCacheUpdated', async (e) => {
     const cid = e.detail?.cacheId;
-    if (cid !== CONFIG_CACHE_ID && cid !== ABOUT_CACHE_ID) return;
     if (!isDidylivLoaded()) return;
 
-    console.log('[Didyliv] Live update: newer data detected, reloading...');
-    loaded = false;
-    await loadDidyliv({ force: false });
+    if (cid === CONFIG_CACHE_ID || cid === ABOUT_CACHE_ID) {
+      // CONFIG/ABOUT changed — full reload
+      console.log('[Didyliv] Live update: config changed, reloading...');
+      loaded = false;
+      await loadDidyliv({ force: false });
+    } else {
+      // Card data changed — re-render the affected open card
+      const affectedCard = Array.from(cardState.entries()).find(([id, st]) => {
+        return st.isOpen && st.views.some(v => {
+          const card = cards.find(c => c.id === id);
+          if (!card) return false;
+          return `${card.sheetId}__${card.sheetName}__${v.range}` === cid;
+        });
+      });
+      if (!affectedCard) return;
+      const [, st] = affectedCard;
+      const card = cards.find(c => c.id === affectedCard[0]);
+      if (card) {
+        console.log('[Didyliv] Live update: card data changed for', card.id);
+        await loadCardData(card, st.view, false);
+      }
+    }
+
     showToast('Дані оновлено ✓');
     markUpdated('reloadDidyliv');
   });

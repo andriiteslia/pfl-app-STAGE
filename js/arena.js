@@ -550,3 +550,16 @@ export async function renderArenaIfReady() {
 export function isArenaLoaded() {
   return loaded;
 }
+
+// ---- Live Update Listener ----
+(function () {
+  document.addEventListener('pflCacheUpdated', async (e) => {
+    if (!isArenaLoaded()) return;
+
+    console.log('[Arena] Live update: newer data detected, reloading...');
+    loaded = false;
+    await loadArena({ force: false });
+    showToast('Дані оновлено ✓');
+    markUpdated('reloadArena');
+  });
+}());

@@ -505,5 +505,6 @@ export function resetFests2026() {
     resetFests2026();
     await mountFests2026({ force: false });
     showToast('Дані оновлено ✓');
+    markUpdated('reload');
   });
 }());

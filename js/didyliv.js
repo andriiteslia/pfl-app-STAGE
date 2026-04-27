@@ -666,5 +666,6 @@ export function isDidylivLoaded() {
     loaded = false;
     await loadDidyliv({ force: false });
     showToast('Дані оновлено ✓');
+    markUpdated('reloadDidyliv');
   });
 }());

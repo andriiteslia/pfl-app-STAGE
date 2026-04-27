@@ -194,6 +194,10 @@ export function markUpdated(btnId, updatedAt) {
 
   const rawTs = updatedAt ? new Date(updatedAt).getTime() : NaN;
   const now = (rawTs && !isNaN(rawTs)) ? rawTs : Date.now();
+
+  // Persist timestamp so next session restores correct label
+  try { localStorage.setItem('pfl_ts::' + btnId, String(now)); } catch(e) {}
+
   updatedTimestamps.set(btnId, now);
 
   // Wrap button if not already wrapped
@@ -213,6 +217,35 @@ export function markUpdated(btnId, updatedAt) {
     wrap.appendChild(label);
   }
   label.textContent = timeAgo(now);
+}
+
+// Restore persisted timestamp label on app open (before data loads)
+export function restoreUpdated(btnId) {
+  try {
+    const saved = localStorage.getItem('pfl_ts::' + btnId);
+    if (!saved) return;
+    const ts = parseInt(saved, 10);
+    if (!Number.isFinite(ts)) return;
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+
+    updatedTimestamps.set(btnId, ts);
+
+    let wrap = btn.closest('.btn-updated-wrap');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.className = 'btn-updated-wrap';
+      btn.parentNode.insertBefore(wrap, btn);
+      wrap.appendChild(btn);
+    }
+    let label = wrap.querySelector('.last-updated');
+    if (!label) {
+      label = document.createElement('span');
+      label.className = 'last-updated';
+      wrap.appendChild(label);
+    }
+    label.textContent = timeAgo(ts);
+  } catch(e) {}
 }
 
 // Auto-refresh all visible timestamps

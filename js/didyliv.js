@@ -4,7 +4,7 @@
    ============================================ */
 
 import { fetchSheetData, fetchSheetDataLive, clearCache, buildCacheId } from './api.js';
-import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, yieldToMain } from './utils.js';
+import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, restoreUpdated, yieldToMain } from './utils.js';
 
 // ---- State ----
 let tags = [];
@@ -280,6 +280,7 @@ async function loadDidylivConfig({ force = false } = {}) {
 
 // ---- Load Didyliv ----
 export async function loadDidyliv({ force = false } = {}) {
+  if (!force) restoreUpdated('reloadDidyliv');
   const reloadBtn = $('#reloadDidyliv');
 
   if (loaded && !force) return;

@@ -5,7 +5,7 @@
 
 import CONFIG from './config.js';
 import { fetchSheetData, clearCache } from './api.js';
-import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, yieldToMain } from './utils.js';
+import { $, $$, escapeHtml, setButtonLoading, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, restoreUpdated, yieldToMain } from './utils.js';
 
 // ---- State ----
 let tags = [];
@@ -180,6 +180,7 @@ async function loadArenaConfig({ force = false } = {}) {
 
 // ---- Load Arena ----
 export async function loadArena({ force = false } = {}) {
+  if (!force) restoreUpdated('reloadArena');
   const reloadBtn = $('#reloadArena');
 
   if (loaded && !force) return;

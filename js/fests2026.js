@@ -5,7 +5,7 @@
 
 import CONFIG from './config.js';
 import { fetchSheetData, fetchSheetDataLive } from './api.js';
-import { $, $$, escapeHtml, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, yieldToMain } from './utils.js';
+import { $, $$, escapeHtml, haptic, parseDividers, shareCard, buildShareLink, SHARE_ICON_SVG, showToast, markUpdated, restoreUpdated, yieldToMain } from './utils.js';
 
 // ---- Config ----
 const CONFIG_2026 = {
@@ -413,6 +413,8 @@ async function renderTableInto(values, targetEl, options = {}) {
 
 // ---- Mount Fests 2026 ----
 export async function mountFests2026({ force = false } = {}) {
+  // Restore last-updated label immediately before async data loads
+  if (!force) restoreUpdated('reload');
   const container = $('#fests2026Container');
   const panel = $('#festsYear2026');
 

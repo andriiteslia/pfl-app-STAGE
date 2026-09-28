@@ -3,6 +3,18 @@
    Based on index_old.html
    ============================================ */
 
+/* ---- Festival History tab loading state (compact .empty-state) ---- */
+#tab-leaderboard .lb-history-loading {
+  min-height: 0;
+  padding: var(--spacing-lg) var(--spacing-md);
+}
+
+#tab-leaderboard .lb-history-loading img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: var(--spacing-sm);
+}
+
 /* ---- Leaderboard Table Styles ---- */
 #tab-leaderboard table tbody tr td,
 #tab-leaderboard table tbody tr td:first-child {

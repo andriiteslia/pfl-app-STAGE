@@ -28,6 +28,16 @@ const getElements = () => ({
 
 // ---- Partner Data (extended info) ----
 const PARTNER_DATA = {
+  ibis: {
+    title: 'IBIS',
+    subtitle: '🏕️ IBIS — мережа спеціалізованих магазинів для активного відпочинку, туризму та риболовлі. Тут знайдеш все необхідне для пригод на природі: спорядження, одяг, взуття та аксесуари від провідних світових брендів 🎒🌲',
+    info: '📱 093 33 26 444<br>📱 099 33 26 444<br>📱 097 33 26 444<br>💬 097 33 26 400 (тільки для повідомлень)<br><br>🕘 Пн – Пт: 09:00–20:00<br>🕘 Сб – Нд: 10:00–19:00',
+    ctaText: 'В магазин 🐟',
+    ctaHref: 'https://ibis-gear.com/',
+    instagram: 'https://www.instagram.com/ibisfishing/',
+    logoBg: '#00785F',
+    detailsLogoSrc: './assets/logos/ibis_big_logo.svg',
+  },
   upstream: {
     title: 'Upstream',
     subtitle: '💥 UPSTREAM Baits — це приманки, створені для реальних рибалок: їстівні силіконові приманки, протестовані профі й ефективні в ловлі хижої риби 🐟 — щуки, судака, окуня як у прісній, так і солоній воді 🛶. Надійний вибір для тих, хто цінує результат замість випадковості 🎯📈',
@@ -204,8 +214,9 @@ function openPartnerDetails(tile) {
   }
 
   // Set logo
-  if (logoImg?.src) {
-    els.detailsLogoImg.src = logoImg.src;
+  const detailsSrc = data.detailsLogoSrc || logoImg?.src;
+  if (detailsSrc) {
+    els.detailsLogoImg.src = detailsSrc;
     els.detailsLogoImg.alt = data.title || defaultTitle;
     els.detailsLogoImg.style.display = 'block';
   } else {
@@ -226,6 +237,7 @@ function openPartnerDetails(tile) {
   els.listView.style.display = 'none';
   els.detailsView.style.display = 'block';
   els.detailsView.classList.add('slide-in');
+  els.detailsView.dataset.currentPartner = partnerId;
   currentView = 'details';
 
   // Show FAB back

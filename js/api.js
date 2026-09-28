@@ -224,6 +224,44 @@ export async function fetchAppStyles(options = {}) {
   }, options);
 }
 
+// ---- Leaderboard position-change (delta) lookup ----
+// Reads the `leaderboard_current` table (populated by a Supabase trigger
+// that runs on every sheet_cache update — see leaderboard_delta_migration.sql).
+// Returns a map: { [participant_name]: { delta, isNew } }
+// On any failure (e.g. migration not applied yet) returns {} so the
+// leaderboard renders normally, just without the badges.
+export async function fetchLeaderboardDeltas() {
+  const url = `${SUPABASE_URL}/rest/v1/leaderboard_current?select=participant_name,delta,is_new`;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+      },
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const rows = await response.json();
+    if (!Array.isArray(rows)) return {};
+
+    const map = {};
+    rows.forEach(r => {
+      const name = String(r?.participant_name ?? '').trim();
+      if (!name) return;
+      map[name] = {
+        delta: r.delta === null || r.delta === undefined ? null : Number(r.delta),
+        isNew: !!r.is_new,
+      };
+    });
+    return map;
+  } catch (error) {
+    console.warn('[API] Failed to fetch leaderboard deltas:', error.message);
+    return {};
+  }
+}
+
 // ---- Cache Management ----
 export function clearCache() {
   // Delete all cache entries so stale data is never returned after reload.

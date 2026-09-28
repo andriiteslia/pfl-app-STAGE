@@ -36,6 +36,68 @@
   transform: scale(0.98);
 }
 
+/* ---- Featured Partner Tile (full-width banner) ---- */
+.partner-tile--featured {
+  flex-direction: row;
+  align-items: center;
+  margin-top: var(--spacing-lg);
+  height: 72px;
+  padding: 0 24px;
+  background: #00785F !important;
+  border-color: transparent;
+}
+
+.partner-tile--featured .partner-tile__logo {
+  position: static;
+  height: 44px;
+  width: auto;
+  flex: 0 0 auto;
+  background: transparent !important;
+  padding: 0;
+  border-radius: 0;
+  overflow: visible;
+  justify-content: flex-start !important;
+  align-items: center;
+}
+
+.partner-tile--featured .partner-tile__logo img {
+  height: 100%;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+}
+
+.partner-tile--featured .logo-fallback {
+  color: rgba(255,255,255,0.5);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.partner-tile--featured .partner-tile__body {
+  padding: 0;
+  flex: 0 0 auto !important;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.partner-tile__featured-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.partner-tile__featured-arrow svg {
+  width: 24px;
+  height: 24px;
+}
+
 /* ---- Logo Section ---- */
 .partner-tile__logo {
   position: relative;
@@ -63,6 +125,10 @@
 
 .partner-tile[data-partner="themain"] .partner-tile__logo {
   background: #000000;
+}
+
+.partner-tile[data-partner="ibis"] .partner-tile__logo {
+  background: #00785F;
 }
 
 .partner-tile__logo img {
@@ -177,6 +243,11 @@
   max-width: 70%;
   max-height: 100px;
   object-fit: contain;
+}
+
+#partnerDetailsView[data-current-partner="ibis"] .partner-details__header img {
+  max-width: 85%;
+  max-height: 120px;
 }
 
 /* ---- Details Body ---- */

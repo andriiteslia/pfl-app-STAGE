@@ -55,6 +55,77 @@
   margin-top: 0;
 }
 
+/* ============================================
+   Festival History — entry pill + empty screen
+   ============================================ */
+
+/* Pill button under the podium, leading to the history screen.
+   Top margin matches .top3-points' margin-top (6px) so the gap here
+   is visually consistent with the gap between a podium name and its
+   points pill. */
+#tab-leaderboard .lb-history-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin: 6px 0 0;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full, 999px);
+  background: var(--card);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+#tab-leaderboard .lb-history-cta:active {
+  transform: scale(0.98);
+  opacity: 0.85;
+}
+
+#tab-leaderboard .lb-history-cta__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+#tab-leaderboard .lb-history-cta__arrow svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+/* Empty "Історія фестивалів" screen (title-only placeholder for now) */
+.lb-history-view {
+  display: none;
+}
+
+.lb-history-view.slide-in {
+  animation: lb-history-slide-in 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes lb-history-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Hide tab bar while the history screen is open (matches partner details) */
+body.leaderboard-history-open .tabs-bar,
+body.leaderboard-history-open::after {
+  display: none !important;
+}
+
 /* ---- PDF CTA Link ---- */
 #tab-leaderboard .leaderboard-pdf-cta {
   margin-top: 32px;
@@ -82,6 +153,65 @@
 
 #tab-leaderboard .leaderboard-pdf-cta .link-btn:active {
   opacity: 0.65;
+}
+
+/* ============================================
+   Position-change badge (▲/▼/NEW next to name)
+   ============================================ */
+#tab-leaderboard table td .lb-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* CSS-drawn triangle — same exact shape/size for both directions,
+   unlike the unicode ▲/▼ glyphs which render inconsistently across fonts */
+#tab-leaderboard table td .lb-delta-arrow {
+  width: 0;
+  height: 0;
+  border-left: 4.5px solid transparent;
+  border-right: 4.5px solid transparent;
+  flex-shrink: 0;
+}
+
+#tab-leaderboard table td .lb-delta--up .lb-delta-arrow {
+  border-bottom: 7px solid currentColor;
+}
+
+#tab-leaderboard table td .lb-delta--down .lb-delta-arrow {
+  border-top: 7px solid currentColor;
+}
+
+#tab-leaderboard table td .lb-delta--up {
+  color: #17A34A;
+}
+
+#tab-leaderboard table td .lb-delta--down {
+  color: #E23D3D;
+}
+
+#tab-leaderboard table td .lb-delta--new {
+  color: #2563EB;
+  font-size: 10px;
+  letter-spacing: .03em;
+}
+
+:root[data-theme="dark"] #tab-leaderboard table td .lb-delta--up {
+  color: #4ADE80;
+}
+
+:root[data-theme="dark"] #tab-leaderboard table td .lb-delta--down {
+  color: #F87171;
+}
+
+:root[data-theme="dark"] #tab-leaderboard table td .lb-delta--new {
+  color: #60A5FA;
 }
 
 /* ============================================
@@ -144,10 +274,10 @@
   padding: 4px 2px 10px;
 }
 
-.lb-skel-person { 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
+.lb-skel-person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .lb-skel-person.p1 { flex: 1.2; }
@@ -158,74 +288,74 @@
 .lb-skel-person.p2 { transform: translateY(24px); }
 .lb-skel-person.p3 { transform: translateY(40px); }
 
-.lb-skel-avatar { 
-  border-radius: 50%; 
-  flex-shrink: 0; 
+.lb-skel-avatar {
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-.lb-skel-crown { 
-  width: 26px; 
-  height: 26px; 
-  margin-bottom: 4px; 
+.lb-skel-crown {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 4px;
 }
 
-.lb-skel-name1 { 
-  margin-top: 8px; 
+.lb-skel-name1 {
+  margin-top: 8px;
   /* 14.8px x2 + 8px + 4px ~= 41.6px (matches loaded name block) */
-  height: 14.8px; 
+  height: 14.8px;
 }
 
-.lb-skel-name2 { 
-  margin-top: 4px; 
-  height: 14.8px; 
+.lb-skel-name2 {
+  margin-top: 4px;
+  height: 14.8px;
 }
 
-.lb-skel-pts { 
-  margin-top: 6px; 
+.lb-skel-pts {
+  margin-top: 6px;
   /* Loaded points pill is ~30px incl. borders */
-  height: 30px; 
-  border-radius: 999px !important; 
+  height: 30px;
+  border-radius: 999px !important;
 }
 
-.lb-skel-stands { 
-  display: flex; 
-  align-items: flex-end; 
-  justify-content: space-between; 
-  gap: 10px; 
-  padding: 0 2px 2px; 
+.lb-skel-stands {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 2px 2px;
 }
 
-.lb-skel-stand { 
-  flex: 1; 
-  border-radius: 4px 4px 0 0; 
+.lb-skel-stand {
+  flex: 1;
+  border-radius: 4px 4px 0 0;
 }
 
-.lb-skel-stand.s1 { 
-  flex: 1.2; 
-  height: 104px; 
+.lb-skel-stand.s1 {
+  flex: 1.2;
+  height: 104px;
 }
 
 .lb-skel-stand.s2 { height: 80px; }
 .lb-skel-stand.s3 { height: 64px; }
 
-.lb-skel-table { 
-  padding: 4px 12px 8px; 
+.lb-skel-table {
+  padding: 4px 12px 8px;
 }
 
-.lb-skel-row { 
-  display: flex; 
-  gap: 10px; 
-  align-items: center; 
-  padding: 11px 0; 
-  border-bottom: 1px solid var(--border); 
+.lb-skel-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
 }
 
-.lb-skel-row:last-child { 
-  border-bottom: none; 
+.lb-skel-row:last-child {
+  border-bottom: none;
 }
 
-.lb-skel-cell { 
-  flex-shrink: 0; 
+.lb-skel-cell {
+  flex-shrink: 0;
 }
 
 /* ============================================

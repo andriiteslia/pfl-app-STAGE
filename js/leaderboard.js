@@ -3,9 +3,9 @@
    Top 3 podium, rankings table
    ============================================ */
 
-import { fetchLeaderboard, fetchLeaderboardConfig, clearCache } from './api.js';
-import { 
-  $, escapeHtml, setButtonLoading, formatNameTwoLines, 
+import { fetchLeaderboard, fetchLeaderboardConfig, fetchLeaderboardDeltas, clearCache } from './api.js';
+import {
+  $, escapeHtml, setButtonLoading, formatNameTwoLines,
   formatPointsLabel, haptic, showToast, shareCard, buildShareLink, SHARE_ICON_SVG, markUpdated, restoreUpdated, yieldToMain
 } from './utils.js';
 
@@ -23,6 +23,7 @@ import {
 let isLoaded = false;
 let isLoading = false;
 let lbConfig = {};
+let isHistoryOpen = false;
 
 // ---- DOM References ----
 const getElements = () => ({
@@ -31,20 +32,102 @@ const getElements = () => ({
   subtitle: $('#subtitle-leaderboard'),
   reloadBtn: $('#reloadLeaderboard'),
   statusBadge: $('#lbStatusBadge'),
+  mainView: $('#leaderboardMainView'),
+  historyView: $('#lbHistoryView'),
+  fabBackHistory: $('#fabBackHistory'),
 });
+
+// ---- Forward-arrow icon (matches the arrow used across the app) ----
+const ARROW_ICON_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12H19M13 6L19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 // ---- Initialize ----
 export function initLeaderboard() {
-  const { reloadBtn } = getElements();
-  
+  const { reloadBtn, fabBackHistory } = getElements();
+
   if (reloadBtn) {
     reloadBtn.addEventListener('click', () => {
       haptic('light');
       loadLeaderboard({ force: true });
     });
   }
-  
+
+  if (fabBackHistory) {
+    fabBackHistory.addEventListener('click', () => {
+      if (!isHistoryOpen) return;
+      haptic('light');
+      closeFestivalHistory();
+    });
+  }
+
+  bindTelegramBackButtonForHistory();
+
   console.log('[Leaderboard] Initialized');
+}
+
+// ---- Festival History View (currently just a title placeholder) ----
+function openFestivalHistory() {
+  const { mainView, historyView } = getElements();
+  if (!mainView || !historyView) return;
+
+  haptic('light');
+
+  mainView.style.display = 'none';
+  historyView.style.display = 'block';
+  historyView.classList.add('slide-in');
+  isHistoryOpen = true;
+
+  const fabBackHistory = $('#fabBackHistory');
+  if (fabBackHistory) fabBackHistory.classList.add('visible');
+
+  showTelegramBackButtonForHistory(true);
+
+  const scroller = $('#app-wrap');
+  if (scroller) scroller.scrollTop = 0;
+
+  document.body.classList.add('leaderboard-history-open');
+}
+
+function closeFestivalHistory() {
+  const { mainView, historyView } = getElements();
+  if (!mainView || !historyView) return;
+
+  historyView.style.display = 'none';
+  historyView.classList.remove('slide-in');
+  mainView.style.display = '';
+  isHistoryOpen = false;
+
+  const fabBackHistory = $('#fabBackHistory');
+  if (fabBackHistory) fabBackHistory.classList.remove('visible');
+
+  showTelegramBackButtonForHistory(false);
+
+  document.body.classList.remove('leaderboard-history-open');
+}
+
+function showTelegramBackButtonForHistory(show) {
+  try {
+    const tg = window.Telegram?.WebApp;
+    if (tg?.BackButton) {
+      if (show) {
+        tg.BackButton.show();
+      } else if (!document.body.classList.contains('partners-details-open')) {
+        tg.BackButton.hide();
+      }
+    }
+  } catch (e) {}
+}
+
+function bindTelegramBackButtonForHistory() {
+  try {
+    const tg = window.Telegram?.WebApp;
+    if (tg?.BackButton?.onClick) {
+      tg.BackButton.onClick(() => {
+        if (isHistoryOpen) {
+          closeFestivalHistory();
+        }
+      });
+    }
+  } catch (e) {}
 }
 
 // ---- Skeleton HTML ----
@@ -93,16 +176,16 @@ const SKELETON_HTML = `
 export async function loadLeaderboard({ force = false } = {}) {
   if (!force) restoreUpdated('reloadLeaderboard');
   const { container, card, subtitle, reloadBtn } = getElements();
-  
+
   if (!container) return;
   if (isLoading) return;
   isLoading = true;
-  
+
   if (force) clearCache();
-  
+
   // Show loading state
   setButtonLoading(reloadBtn, true);
-  
+
   if (!isLoaded || force) {
     // Show skeleton
     container.innerHTML = SKELETON_HTML;
@@ -112,49 +195,52 @@ export async function loadLeaderboard({ force = false } = {}) {
       subtitle.textContent = 'Оновлюю дані Predator Fest League. Головний приз - Shimano Vanquish CE C2500S!';
     }
   }
-  
+
   try {
-    // Load config and data in parallel
-    const [configData, leaderboardData] = await Promise.all([
+    // Load config, data, and position-change deltas in parallel.
+    // fetchLeaderboardDeltas() fails soft (returns {}) if the
+    // leaderboard_current table/trigger hasn't been set up yet.
+    const [configData, leaderboardData, deltaMap] = await Promise.all([
       fetchLeaderboardConfig({ force, liveUpdate: !force }),
       fetchLeaderboard({ force, liveUpdate: !force }),
+      fetchLeaderboardDeltas(),
     ]);
-    
+
     // Parse config
     if (configData?.ok && Array.isArray(configData.values)) {
       lbConfig = parseConfig(configData.values);
       renderStatusBadge();
     }
-    
+
     // Render leaderboard
     if (!leaderboardData?.ok || !Array.isArray(leaderboardData.values)) {
       throw new Error('Invalid data');
     }
-    
-    await renderLeaderboard(leaderboardData.values);
-    
+
+    await renderLeaderboard(leaderboardData.values, deltaMap);
+
     if (subtitle) {
       subtitle.textContent = 'Рейтинг учасників Predator Fest League. Головний приз - Shimano Vanquish CE C2500S!';
     }
-    
+
     // Fade-in content after skeleton
     if (container) container.classList.add('content-fade-in');
-    
+
     if (card) card.classList.add('is-loaded');
     isLoaded = true;
     markUpdated('reloadLeaderboard', force ? undefined : leaderboardData.updated_at);
-    
+
     // Toast on force reload
     if (force) showToast('Оновлено ✓');
-    
+
   } catch (error) {
     console.error('[Leaderboard] Load error:', error);
-    
+
     if (subtitle) {
       subtitle.textContent = 'Помилка завантаження';
     }
     container.innerHTML = '<div class="loading-text">Не вдалося завантажити дані.</div>';
-    
+
   } finally {
     isLoading = false;
     setButtonLoading(reloadBtn, false);
@@ -176,13 +262,13 @@ function parseConfig(values) {
 function renderStatusBadge() {
   const badge = $('#lbStatusBadge');
   if (!badge) return;
-  
+
   const text = lbConfig.status_text || lbConfig.badge_text || lbConfig.text || '';
   if (!text) {
     badge.style.display = 'none';
     return;
   }
-  
+
   badge.style.display = '';
   badge.textContent = text;
 }
@@ -289,16 +375,40 @@ function guessNameIdx(headersLower, colStats, pointsIdx) {
   return best;
 }
 
+// ---- Position-Change Badge ----
+// Looks up a participant's delta in the map fetched from leaderboard_current
+// and returns the ▲ / ▼ / NEW badge markup (or '' if no data / no change).
+// The arrow is a CSS-drawn triangle (not a unicode glyph) so both directions
+// render as the exact same shape and size across all fonts/platforms.
+function buildDeltaBadge(rawName, deltaMap) {
+  const name = String(rawName ?? '').trim();
+  if (!name || !deltaMap) return '';
+
+  const info = deltaMap[name];
+  if (!info) return '';
+
+  if (info.isNew) {
+    return `<span class="lb-delta lb-delta--new">NEW</span>`;
+  }
+
+  const d = info.delta;
+  if (d === null || d === undefined || d === 0) return '';
+
+  const up = d > 0;
+  const cls = up ? 'lb-delta--up' : 'lb-delta--down';
+  return `<span class="lb-delta ${cls}"><span class="lb-delta-arrow"></span>${Math.abs(d)}</span>`;
+}
+
 // ---- Render Leaderboard ----
-async function renderLeaderboard(values) {
+async function renderLeaderboard(values, deltaMap = {}) {
   const { container } = getElements();
   if (!container) return;
-  
+
   const header = values[0];
-  const rows = values.slice(1).filter(r => 
+  const rows = values.slice(1).filter(r =>
     Array.isArray(r) && r.some(c => String(c ?? '').trim() !== '')
   );
-  
+
   // Find column indices (robust: handles unknown header labels)
   const hLower = header.map(h => String(h ?? '').toLowerCase());
   const colStats = calcColStats(rows, header.length);
@@ -319,42 +429,54 @@ async function renderLeaderboard(values) {
   if (nameIdx === pointsIdx && header.length > 1) {
     nameIdx = pointsIdx === 0 ? 1 : 0;
   }
-  
+
   // Build HTML (CPU work)
   const top3Html = buildTop3Podium(rows, nameIdx, pointsIdx);
-  const tableHtml = buildTable(header, rows);
+  const tableHtml = buildTable(header, rows, nameIdx, deltaMap);
 
   await yieldToMain();
-  
+
   // DOM write
   container.innerHTML = `
     ${top3Html}
+    <button class="lb-history-cta" id="lbHistoryCta" type="button">
+      <span class="lb-history-cta__label">Історія фестивалів</span>
+      <span class="lb-history-cta__arrow" aria-hidden="true">${ARROW_ICON_SVG}</span>
+    </button>
     <div class="table-wrap" role="region" aria-label="2026 Leaderboard table">
       ${tableHtml}
     </div>
   `;
 
   await yieldToMain();
-  
+
   // Re-render status badge (it's inside the podium)
   renderStatusBadge();
-  
+
   // Trigger podium entrance animation
   const podium = container.querySelector('.top3-podium');
   if (podium) {
     podium.classList.add('podium-entrance');
     setTimeout(() => podium.classList.remove('podium-entrance'), 1200);
   }
-  
+
   // Connect Easter eggs (crown tap, long-press 2nd place)
   initEasterEggs();
-  
+
   // Share button
   const shareBtn = container.querySelector('.lb-share-btn');
   if (shareBtn) {
     shareBtn.addEventListener('click', () => {
       const deepLink = buildShareLink('leaderboard');
       shareCard(deepLink, 'PFL Leaderboard');
+    });
+  }
+
+  // Festival history entry point
+  const historyCta = container.querySelector('#lbHistoryCta');
+  if (historyCta) {
+    historyCta.addEventListener('click', () => {
+      openFestivalHistory();
     });
   }
 }
@@ -371,7 +493,7 @@ function initEasterEggs() {
       crown.addEventListener('animationend', () => {
         // Swap to crab
         crown.textContent = '🦀';
-        
+
         // Swap back after delay
         setTimeout(() => {
           crown.textContent = '👑';
@@ -435,47 +557,47 @@ function initEasterEggs() {
 function buildTop3Podium(rows, nameIdx, pointsIdx) {
   const winners = rows.slice(0, 3);
   if (!winners.length) return '';
-  
+
   const getName = (row) => formatNameTwoLines(row?.[nameIdx]);
   const getPoints = (row) => formatPointsLabel(row?.[pointsIdx]);
-  
+
   const n1 = getName(winners[0]);
   const n2 = getName(winners[1]);
   const n3 = getName(winners[2]);
-  
+
   const pts1 = getPoints(winners[0]);
   const pts2 = getPoints(winners[1]);
   const pts3 = getPoints(winners[2]);
-  
+
   return `
     <div class="top3-podium" aria-label="Top 3 winners podium">
       <div class="top3-podium__inner">
         <div id="lbStatusBadge" class="lb-status-badge" style="display:none;"></div>
         <button class="lb-share-btn" type="button" aria-label="Share">${SHARE_ICON_SVG}</button>
-        
+
         ${buildAquarium()}
-        
+
         <div class="top3-people">
           <div class="top3-person place2">
             <div class="top3-avatar"><img src="./assets/imgs/podium-2.png" alt="" fetchpriority="high" /></div>
             <div class="top3-name">${n2}</div>
             <div class="top3-points">${pts2}</div>
           </div>
-          
+
           <div class="top3-person place1">
             <div class="top3-crown">👑</div>
             <div class="top3-avatar"><img src="./assets/imgs/podium-1.png" alt="" fetchpriority="high" /></div>
             <div class="top3-name">${n1}</div>
             <div class="top3-points">${pts1}</div>
           </div>
-          
+
           <div class="top3-person place3">
             <div class="top3-avatar"><img src="./assets/imgs/podium-3.png" alt="" fetchpriority="high" /></div>
             <div class="top3-name">${n3}</div>
             <div class="top3-points">${pts3}</div>
           </div>
         </div>
-        
+
         <div class="top3-stands">
           <div class="top3-stand s2"><div class="num">2</div></div>
           <div class="top3-stand s1"><div class="num">1</div></div>
@@ -521,7 +643,7 @@ function buildAquarium() {
   return `
     <div class="top3-aqua" aria-hidden="true">
       ${fishHTML}
-      
+
       <span class="aqua-bubble" style="--d:4s; --x:8%; --sz:5px; --del:0s;"></span>
       <span class="aqua-bubble" style="--d:6s; --x:22%; --sz:8px; --del:1.5s;"></span>
       <span class="aqua-bubble" style="--d:5s; --x:45%; --sz:6px; --del:0.7s;"></span>
@@ -529,24 +651,29 @@ function buildAquarium() {
       <span class="aqua-bubble" style="--d:4.5s; --x:85%; --sz:5px; --del:1s;"></span>
       <span class="aqua-bubble" style="--d:6.5s; --x:55%; --sz:7px; --del:3.5s;"></span>
       <span class="aqua-bubble" style="--d:5.5s; --x:35%; --sz:4px; --del:5s;"></span>
-      
+
       <span class="aqua-crab" id="aquaCrab">🦀</span>
     </div>
   `;
 }
 
 // ---- Build Table ----
-function buildTable(header, rows) {
-  const thead = '<tr>' + header.map(h => 
+function buildTable(header, rows, nameIdx, deltaMap = {}) {
+  const thead = '<tr>' + header.map(h =>
     `<th>${escapeHtml(h)}</th>`
   ).join('') + '</tr>';
-  
-  const tbody = rows.map(row => 
-    '<tr>' + header.map((_, i) => 
-      `<td>${escapeHtml(row?.[i] ?? '')}</td>`
-    ).join('') + '</tr>'
+
+  const tbody = rows.map(row =>
+    '<tr>' + header.map((_, i) => {
+      const raw = row?.[i] ?? '';
+      if (i === nameIdx) {
+        const badge = buildDeltaBadge(raw, deltaMap);
+        return `<td>${escapeHtml(raw)}${badge}</td>`;
+      }
+      return `<td>${escapeHtml(raw)}</td>`;
+    }).join('') + '</tr>'
   ).join('');
-  
+
   return `
     <table>
       <thead>${thead}</thead>

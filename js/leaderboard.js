@@ -60,8 +60,30 @@ export function initLeaderboard() {
   }
 
   bindTelegramBackButtonForHistory();
+  initFestivalHistorySegments();
 
   console.log('[Leaderboard] Initialized');
+}
+
+// ---- Festival History — segmented control (fests 1-5) ----
+function initFestivalHistorySegments() {
+  const seg = $('#lbHistorySeg');
+  if (!seg) return;
+
+  seg.querySelectorAll('.segment').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('active')) return;
+      haptic('light');
+
+      seg.querySelectorAll('.segment').forEach(s => s.classList.toggle('active', s === btn));
+
+      const festNum = btn.dataset.fest;
+      for (let i = 1; i <= 5; i++) {
+        const out = $(`#lbHistoryOut${i}`);
+        if (out) out.classList.toggle('table-collapsed', String(i) !== festNum);
+      }
+    });
+  });
 }
 
 // ---- Festival History View (currently just a title placeholder) ----

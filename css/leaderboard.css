@@ -3,18 +3,6 @@
    Based on index_old.html
    ============================================ */
 
-/* ---- Festival History tab loading state (compact .empty-state) ---- */
-#tab-leaderboard .lb-history-loading {
-  min-height: 0;
-  padding: var(--spacing-lg) var(--spacing-md);
-}
-
-#tab-leaderboard .lb-history-loading img {
-  width: 100px;
-  height: 100px;
-  margin-bottom: var(--spacing-sm);
-}
-
 /* ---- Leaderboard Table Styles ---- */
 #tab-leaderboard table tbody tr td,
 #tab-leaderboard table tbody tr td:first-child {
@@ -65,77 +53,6 @@
 
 #tab-leaderboard .card > .top3-podium {
   margin-top: 0;
-}
-
-/* ============================================
-   Festival History — entry pill + empty screen
-   ============================================ */
-
-/* Pill button under the podium, leading to the history screen.
-   Top margin matches .top3-points' margin-top (6px) so the gap here
-   is visually consistent with the gap between a podium name and its
-   points pill. */
-#tab-leaderboard .lb-history-cta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  margin: 6px 0 0;
-  padding: 12px 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full, 999px);
-  background: var(--card);
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 700;
-  font-family: var(--font-ui);
-  cursor: pointer;
-  transition: transform var(--transition-fast), opacity var(--transition-fast);
-}
-
-#tab-leaderboard .lb-history-cta:active {
-  transform: scale(0.98);
-  opacity: 0.85;
-}
-
-#tab-leaderboard .lb-history-cta__arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 0;
-}
-
-#tab-leaderboard .lb-history-cta__arrow svg {
-  width: 18px;
-  height: 18px;
-  display: block;
-}
-
-/* Empty "Історія фестивалів" screen (title-only placeholder for now) */
-.lb-history-view {
-  display: none;
-}
-
-.lb-history-view.slide-in {
-  animation: lb-history-slide-in 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-}
-
-@keyframes lb-history-slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(60px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Hide tab bar while the history screen is open (matches partner details) */
-body.leaderboard-history-open .tabs-bar,
-body.leaderboard-history-open::after {
-  display: none !important;
 }
 
 /* ---- PDF CTA Link ---- */

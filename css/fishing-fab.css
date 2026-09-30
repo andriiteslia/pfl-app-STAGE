@@ -1,0 +1,126 @@
+/* ============================================
+   PFL App — Fishing mini-game: FAB + full-screen container
+   (the game's own styles live in fishing/fishing.css, loaded lazily)
+   ============================================ */
+
+/* ---- FAB «Рибалити!» — the .btn look (like «Оновити»),
+        20px above the tab bar, centred, levitating ---- */
+.fab-fishing {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px) + 64px + 20px); /* tab bar: bottom 28 + pill 64 */
+  width: max-content;
+  margin: 0 auto;
+  padding: 0 22px;
+  z-index: 101;
+  display: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(18, 122, 201, 0.4);          /* same shadow as .fab-back */
+}
+
+.fab-fishing.is-visible {
+  display: inline-flex;
+  animation:
+    fabFishingIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both,
+    fabFishingFloat 3.2s ease-in-out 0.3s infinite;
+}
+
+.fab-fishing:active {
+  transform: scale(0.95);
+}
+
+/* `translate` (not transform) so the float never fights :active */
+@keyframes fabFishingFloat {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -4px; }
+}
+
+@keyframes fabFishingIn {
+  from { opacity: 0; scale: 0.9; }
+  to   { opacity: 1; scale: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab-fishing.is-visible { animation: none; }
+}
+
+/* keep the last rows of Fests reachable above the FAB */
+body.fishing-fab-visible #app-content {
+  padding-bottom: 160px; /* 96 (tab bar) + 44 (FAB) + 20 (gap) */
+}
+
+/* ---- Full-screen game container (above everything in the app) ---- */
+.fishing-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+}
+
+.fishing-root[hidden] {
+  display: none;
+}
+
+/* ---- Splash while the game loads (first open) ---- */
+.fishing-splash {
+  position: absolute;
+  inset: 0;
+  z-index: 10;                       /* above #fishingGame */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #a9cdf0 0%, #7fb0da 48%, #2c4a66 52%, #0d1b26 100%);
+  opacity: 1;
+  transition: opacity 0.3s ease;     /* SPLASH_FADE_MS in fishing-launcher.js */
+}
+
+.fishing-splash[hidden] {
+  display: none;
+}
+
+.fishing-splash.is-hiding {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fishing-splash__logo {
+  width: min(62vw, 260px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fishingLogoFloat 2.4s ease-in-out infinite;
+}
+
+.fishing-splash__logo img {
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  filter: drop-shadow(0 10px 18px rgba(13, 27, 38, 0.35));
+}
+
+.fishing-splash.has-logo .fishing-splash__logo img { opacity: 1; }
+.fishing-splash.no-logo .fishing-splash__logo img  { display: none; }
+
+/* text fallback until game-logo.png is added */
+.fishing-splash__fallback {
+  display: none;
+  font-family: 'Manrope', var(--font-ui);
+  font-size: 40px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 6px 18px rgba(13, 27, 38, 0.45);
+}
+
+.fishing-splash.no-logo .fishing-splash__fallback { display: block; }
+
+@keyframes fishingLogoFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fishing-splash__logo { animation: none; }
+}

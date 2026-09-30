@@ -262,32 +262,6 @@ export async function fetchLeaderboardDeltas() {
   }
 }
 
-// ---- Festival History (leaderboard_fest_snapshots) ----
-// Reads the cumulative standings right after a given festival (fest_number),
-// as computed and seeded by leaderboard_fest_history_seed.sql.
-// Returns an array of rows sorted by position, or [] on any failure
-// (e.g. that fest hasn't been seeded yet).
-export async function fetchFestSnapshot(festNumber) {
-  const url = `${SUPABASE_URL}/rest/v1/leaderboard_fest_snapshots?fest_number=eq.${encodeURIComponent(festNumber)}&select=participant_name,position,points,weight,fests_count&order=position.asc`;
-
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-      },
-    });
-
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const rows = await response.json();
-    return Array.isArray(rows) ? rows : [];
-  } catch (error) {
-    console.warn(`[API] Failed to fetch fest #${festNumber} snapshot:`, error.message);
-    return [];
-  }
-}
-
 // ---- Cache Management ----
 export function clearCache() {
   // Delete all cache entries so stale data is never returned after reload.

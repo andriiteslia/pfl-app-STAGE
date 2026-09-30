@@ -1,0 +1,129 @@
+<!-- PFL Fishing — game screen. Loaded on the first open by js/fishing-launcher.js
+       (source: pfl-fishing-game-wip/index.html). Asset paths are relative to the app root. -->
+  <section id="fishingGame" class="fishing-game" data-state="idle">
+
+    <div id="fgStage" class="fg-stage">
+      <!-- SCENE ARTWORK — water = bottom 60% of the screen, land on top of it, sky above -->
+      <div class="fg-world" aria-hidden="true">
+        <div class="fg-sky"></div>
+        <img class="fg-water" src="./assets/fishing/water.webp" alt="" draggable="false">
+        <img class="fg-land" src="./assets/fishing/land.webp" alt="" draggable="false">
+      </div>
+
+      <!-- Rod / line / lure — drawn by fishing-view.js in screen px (rod = 88% of screen height).
+           The rod blank is generated from rod.svg's shape so it can bend. -->
+      <svg id="fgPlaceholder" class="fg-layer fg-scene-svg" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="fgGripGrad" x1="185" y1="654" x2="196.5" y2="651.5" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#1F1F1F"/>
+            <stop offset="0.480769" stop-color="#333333"/>
+            <stop offset="1" stop-color="#1F1F1F"/>
+          </linearGradient>
+        </defs>
+        <g id="fgRipples" class="fg-ripples"></g>
+        <path id="fgLine" class="fg-line" d="" />
+        <!-- soft bait under the jig head, only while it hangs from the rod tip (bait.png → bait.webp, head up) -->
+        <image id="fgBait" class="fg-bait" href="./assets/fishing/bait.webp" x="0" y="0" width="7.4" height="40" preserveAspectRatio="none" />
+        <circle id="fgLure" class="fg-lure" r="4" cx="0" cy="0" />
+        <path id="fgRod" class="fg-rod" d="" />
+        <!-- rod grip from rod.svg (transform set by JS: rod tip position + scale) -->
+        <path id="fgGrip" fill="url(#fgGripGrad)"
+          d="M188.968 630.434L204.014 675.548C205.483 679.952 202.206 684.5 197.564 684.5C194.447 684.5 191.729 682.381 190.969 679.359L179.366 633.238C178.637 630.343 180.589 627.459 183.547 627.057C185.93 626.734 188.207 628.152 188.968 630.434Z"/>
+      </svg>
+      <div id="fgSplash" class="fg-splash"></div>
+      <div id="fgCastDist" class="fg-cast-dist" aria-live="polite"></div>
+
+      <!-- Cast aim: power bar rotated to the swipe direction + landing target on the water -->
+      <div id="fgAim" class="fg-aim"><div class="fg-aim__bar"></div></div>
+      <div class="fg-target" aria-hidden="true"></div>
+
+      <!-- HUD -->
+      <button id="fgExit" class="fg-glass fg-exit" type="button" aria-label="Вийти з гри">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M5 5 L19 19 M19 5 L5 19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div id="fgStats" class="fg-glass fg-stats" role="button" aria-label="Мій улов" aria-live="polite">
+        <div class="fg-stat">
+          <div class="fg-stat__label">Улов</div>
+          <div id="fgScore" class="fg-stat__value">0</div>
+        </div>
+        <div class="fg-stats__divider"></div>
+        <div class="fg-stat">
+          <div class="fg-stat__label">Вага</div>
+          <div id="fgWeight" class="fg-stat__value">0 г</div>
+        </div>
+      </div>
+      <!-- Sound on/off (icons from volume-2.svg / volume-x.svg) -->
+      <button id="fgSound" class="fg-glass fg-exit fg-sound" type="button" aria-label="Звук" aria-pressed="true">
+        <svg class="fg-sound__on" viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
+          <path d="M16 9C16.65 9.87 17 10.92 17 12C17 13.08 16.65 14.13 16 15M19.36 18.36C20.2 17.53 20.86 16.54 21.32 15.44C21.77 14.35 22 13.18 22 12C22 10.82 21.77 9.65 21.32 8.56C20.86 7.46 20.2 6.47 19.36 5.64M11 4.7C11 4.56 10.96 4.43 10.88 4.31C10.8 4.2 10.69 4.1 10.56 4.05C10.44 4 10.29 3.98 10.16 4.01C10.02 4.04 9.9 4.11 9.8 4.2L6.41 7.59C6.28 7.72 6.13 7.82 5.96 7.89C5.78 7.96 5.6 8 5.42 8H3C2.73 8 2.48 8.11 2.29 8.29C2.11 8.48 2 8.73 2 9V15C2 15.27 2.11 15.52 2.29 15.71C2.48 15.89 2.73 16 3 16H5.42C5.6 16 5.78 16.04 5.96 16.11C6.13 16.18 6.28 16.28 6.41 16.41L9.8 19.8C9.89 19.9 10.02 19.96 10.16 19.99C10.29 20.02 10.44 20 10.56 19.95C10.69 19.9 10.8 19.81 10.88 19.69C10.96 19.57 11 19.44 11 19.3V4.7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg class="fg-sound__off" viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
+          <path d="M16.5 14.5L21.5 9.5M16.5 9.5L21.5 14.5M11 4.7C11 4.56 10.96 4.42 10.89 4.31C10.81 4.19 10.7 4.1 10.57 4.04C10.44 3.99 10.3 3.98 10.16 4.01C10.02 4.03 9.89 4.1 9.8 4.2L6.41 7.59C6.28 7.72 6.13 7.82 5.96 7.89C5.78 7.96 5.6 8 5.42 8H3C2.73 8 2.48 8.11 2.29 8.29C2.11 8.48 2 8.73 2 9V15C2 15.27 2.11 15.52 2.29 15.71C2.48 15.89 2.73 16 3 16H5.42C5.6 16 5.78 16.04 5.96 16.11C6.13 16.18 6.28 16.28 6.41 16.41L9.8 19.8C9.89 19.9 10.02 19.97 10.16 20C10.3 20.03 10.44 20.01 10.57 19.96C10.7 19.9 10.81 19.81 10.89 19.69C10.96 19.58 11 19.44 11 19.3V4.7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button id="fgDebugToggle" class="fg-hud-btn fg-debug-toggle" type="button">dbg</button>
+      <pre id="fgDebug" class="fg-debug" hidden></pre>
+
+      <div class="fg-bite-indicator" aria-hidden="true">!</div>
+      <div id="fgHint" class="fg-hint"></div>
+      <div id="fgToast" class="fg-toast"></div>
+
+      <!-- Catch card (species picture from assets/fishing/<species>.webp, emoji fallback) -->
+      <div id="fgCatch" class="fg-catch" aria-live="polite">
+        <div class="fg-catch__pic">
+          <img id="fgCatchImg" alt="" draggable="false">
+          <span id="fgCatchEmoji" class="fg-catch__emoji" hidden>🐟</span>
+        </div>
+        <div class="fg-catch__name" id="fgCatchName"></div>
+        <div class="fg-catch__meta"><span id="fgCatchWeight"></span><span class="fg-catch__sep"> · </span><b id="fgCatchDelta"></b></div>
+        <div class="fg-catch__note" id="fgCatchNote" hidden></div>
+      </div>
+
+      <!-- Controls -->
+      <button id="fgTwitch" class="fg-control fg-twitch" type="button" aria-label="Смикнути / підсікти">
+        <span class="fg-twitch__ring"></span>
+        <span class="fg-twitch__dot"></span>
+      </button>
+
+      <!-- Line tension gauge — vertical, above the lever, visible only while a fish is on -->
+      <div class="fg-tension" aria-hidden="true">
+        <div class="fg-tension__bar">
+          <div class="fg-tension__fill"></div>
+          <div class="fg-tension__mark fg-tension__mark--warn"></div>
+          <div class="fg-tension__mark fg-tension__mark--danger"></div>
+        </div>
+      </div>
+
+      <div id="fgLever" class="fg-control fg-lever" aria-label="Котушка">
+        <div id="fgLeverTrack" class="fg-lever__track">
+          <div class="fg-lever__fill"></div>
+        </div>
+        <div class="fg-lever__knob"><span></span></div>
+      </div>
+    </div>
+
+    <!-- Catch summary: tap the Улов/Вага pill. The game is paused while it's open. -->
+    <div id="fgBag" class="fg-bag" hidden>
+      <div class="fg-bag__backdrop" data-close></div>
+      <div class="fg-bag__sheet" role="dialog" aria-modal="true" aria-labelledby="fgBagTitle">
+        <div class="fg-bag__head">
+          <div>
+            <div id="fgBagTitle" class="fg-bag__title">Мій улов</div>
+            <div id="fgBagSub" class="fg-bag__sub"></div>
+          </div>
+          <button class="fg-bag__close" type="button" aria-label="Закрити" data-close>
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path d="M6 6 L18 18 M18 6 L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <ol id="fgBagList" class="fg-bag__list"></ol>
+        <div id="fgBagEmpty" class="fg-bag__empty" hidden>
+          <div class="fg-bag__empty-icon">🎣</div>
+          Поки порожньо — закидай і лови!
+        </div>
+      </div>
+    </div>
+  </section>

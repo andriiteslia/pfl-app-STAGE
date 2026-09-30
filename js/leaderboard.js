@@ -3,7 +3,7 @@
    Top 3 podium, rankings table
    ============================================ */
 
-import { fetchLeaderboard, fetchLeaderboardConfig, fetchLeaderboardDeltas, fetchFestSnapshot, clearCache } from './api.js';
+import { fetchLeaderboard, fetchLeaderboardConfig, fetchLeaderboardDeltas, clearCache } from './api.js';
 import {
   $, escapeHtml, setButtonLoading, formatNameTwoLines,
   formatPointsLabel, haptic, showToast, shareCard, buildShareLink, SHARE_ICON_SVG, markUpdated, restoreUpdated, yieldToMain
@@ -23,7 +23,6 @@ import {
 let isLoaded = false;
 let isLoading = false;
 let lbConfig = {};
-let isHistoryOpen = false;
 
 // ---- DOM References ----
 const getElements = () => ({
@@ -32,17 +31,11 @@ const getElements = () => ({
   subtitle: $('#subtitle-leaderboard'),
   reloadBtn: $('#reloadLeaderboard'),
   statusBadge: $('#lbStatusBadge'),
-  mainView: $('#leaderboardMainView'),
-  historyView: $('#lbHistoryView'),
-  fabBackHistory: $('#fabBackHistory'),
 });
-
-// ---- Forward-arrow icon (matches the arrow used across the app) ----
-const ARROW_ICON_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12H19M13 6L19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 // ---- Initialize ----
 export function initLeaderboard() {
-  const { reloadBtn, fabBackHistory } = getElements();
+  const { reloadBtn } = getElements();
 
   if (reloadBtn) {
     reloadBtn.addEventListener('click', () => {
@@ -51,196 +44,7 @@ export function initLeaderboard() {
     });
   }
 
-  if (fabBackHistory) {
-    fabBackHistory.addEventListener('click', () => {
-      if (!isHistoryOpen) return;
-      haptic('light');
-      closeFestivalHistory();
-    });
-  }
-
-  bindTelegramBackButtonForHistory();
-  initFestivalHistorySegments();
-
   console.log('[Leaderboard] Initialized');
-}
-
-// ---- Festival History — segmented control (fests 1-6) ----
-const FEST_TAB_COUNT = 6;
-const festSnapshotCache = {}; // { [festNumber]: rows[] | null (fetch in-flight/failed) }
-
-// Same "perch" loading state used on the Fests tab while it refreshes.
-const FEST_LOADING_HTML = `
-  <div class="empty-state lb-history-loading">
-    <img src="./assets/imgs/perch.png" alt="Perch" width="100" height="100">
-    <p class="empty-state__text">Зачекайте будь ласка,<br>оновлюю дані...</p>
-  </div>
-`;
-
-function initFestivalHistorySegments() {
-  const seg = $('#lbHistorySeg');
-  if (!seg) return;
-
-  seg.querySelectorAll('.segment').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (btn.classList.contains('active')) return;
-      haptic('light');
-
-      seg.querySelectorAll('.segment').forEach(s => s.classList.toggle('active', s === btn));
-
-      const festNum = btn.dataset.fest;
-      for (let i = 1; i <= FEST_TAB_COUNT; i++) {
-        const out = $(`#lbHistoryOut${i}`);
-        if (out) out.classList.toggle('table-collapsed', String(i) !== festNum);
-      }
-
-      loadFestTab(Number(festNum));
-    });
-  });
-}
-
-// Fetches (with caching) the standings right after fest N, plus fest N-1
-// for the delta comparison, and renders the table into #lbHistoryOutN.
-async function loadFestTab(festNum) {
-  const out = $(`#lbHistoryOut${festNum}`);
-  if (!out) return;
-
-  // Already rendered — nothing to do.
-  if (out.dataset.loaded === '1') return;
-
-  // Show the same "perch" loading state as the Fests tab while we fetch.
-  const alreadyCached = festSnapshotCache[festNum] !== undefined;
-  if (!alreadyCached) out.innerHTML = FEST_LOADING_HTML;
-
-  const [current, previous] = await Promise.all([
-    getFestSnapshotCached(festNum),
-    festNum > 1 ? getFestSnapshotCached(festNum - 1) : Promise.resolve([]),
-  ]);
-
-  if (!current || current.length === 0) {
-    out.innerHTML = `<div class="loading-text">Дані по цьому фесту ще не додані.</div>`;
-    return;
-  }
-
-  out.innerHTML = buildFestHistoryTable(current, previous, festNum);
-  out.dataset.loaded = '1';
-}
-
-async function getFestSnapshotCached(festNum) {
-  if (festSnapshotCache[festNum]) return festSnapshotCache[festNum];
-  const rows = await fetchFestSnapshot(festNum);
-  festSnapshotCache[festNum] = rows;
-  return rows;
-}
-
-// ---- Build fest-history table (position, name + delta badge, points) ----
-function buildFestHistoryTable(current, previous, festNum) {
-  const prevPosByName = {};
-  (previous || []).forEach(r => {
-    const name = String(r?.participant_name ?? '').trim();
-    if (name) prevPosByName[name] = r.position;
-  });
-
-  const thead = '<tr><th>#</th><th>Учасник</th><th>Бали</th></tr>';
-
-  const tbody = current.map(row => {
-    const name = String(row?.participant_name ?? '').trim();
-    const badge = festNum === 1 ? '' : buildFestDeltaBadge(name, row.position, prevPosByName);
-    return `<tr><td>${row.position}</td><td>${escapeHtml(name)}${badge}</td><td>${escapeHtml(row.points ?? '')}</td></tr>`;
-  }).join('');
-
-  return `
-    <div class="table-wrap" role="region" aria-label="Результати після фесту #${festNum}">
-      <table>
-        <thead>${thead}</thead>
-        <tbody>${tbody}</tbody>
-      </table>
-    </div>
-  `;
-}
-
-function buildFestDeltaBadge(name, position, prevPosByName) {
-  if (!name) return '';
-
-  if (!(name in prevPosByName)) {
-    return `<span class="lb-delta lb-delta--new">NEW</span>`;
-  }
-
-  const d = prevPosByName[name] - position;
-  if (!d) return '';
-
-  const cls = d > 0 ? 'lb-delta--up' : 'lb-delta--down';
-  return `<span class="lb-delta ${cls}"><span class="lb-delta-arrow"></span>${Math.abs(d)}</span>`;
-}
-
-// ---- Festival History View (currently just a title placeholder) ----
-function openFestivalHistory() {
-  const { mainView, historyView } = getElements();
-  if (!mainView || !historyView) return;
-
-  haptic('light');
-
-  mainView.style.display = 'none';
-  historyView.style.display = 'block';
-  historyView.classList.add('slide-in');
-  isHistoryOpen = true;
-
-  const fabBackHistory = $('#fabBackHistory');
-  if (fabBackHistory) fabBackHistory.classList.add('visible');
-
-  showTelegramBackButtonForHistory(true);
-
-  const scroller = $('#app-wrap');
-  if (scroller) scroller.scrollTop = 0;
-
-  document.body.classList.add('leaderboard-history-open');
-
-  // Load whichever tab is currently active (fest #1 by default)
-  const activeSeg = $('#lbHistorySeg .segment.active');
-  loadFestTab(activeSeg ? Number(activeSeg.dataset.fest) : 1);
-}
-
-function closeFestivalHistory() {
-  const { mainView, historyView } = getElements();
-  if (!mainView || !historyView) return;
-
-  historyView.style.display = 'none';
-  historyView.classList.remove('slide-in');
-  mainView.style.display = '';
-  isHistoryOpen = false;
-
-  const fabBackHistory = $('#fabBackHistory');
-  if (fabBackHistory) fabBackHistory.classList.remove('visible');
-
-  showTelegramBackButtonForHistory(false);
-
-  document.body.classList.remove('leaderboard-history-open');
-}
-
-function showTelegramBackButtonForHistory(show) {
-  try {
-    const tg = window.Telegram?.WebApp;
-    if (tg?.BackButton) {
-      if (show) {
-        tg.BackButton.show();
-      } else if (!document.body.classList.contains('partners-details-open')) {
-        tg.BackButton.hide();
-      }
-    }
-  } catch (e) {}
-}
-
-function bindTelegramBackButtonForHistory() {
-  try {
-    const tg = window.Telegram?.WebApp;
-    if (tg?.BackButton?.onClick) {
-      tg.BackButton.onClick(() => {
-        if (isHistoryOpen) {
-          closeFestivalHistory();
-        }
-      });
-    }
-  } catch (e) {}
 }
 
 // ---- Skeleton HTML ----
@@ -552,10 +356,6 @@ async function renderLeaderboard(values, deltaMap = {}) {
   // DOM write
   container.innerHTML = `
     ${top3Html}
-    <button class="lb-history-cta" id="lbHistoryCta" type="button">
-      <span class="lb-history-cta__label">Історія фестивалів</span>
-      <span class="lb-history-cta__arrow" aria-hidden="true">${ARROW_ICON_SVG}</span>
-    </button>
     <div class="table-wrap" role="region" aria-label="2026 Leaderboard table">
       ${tableHtml}
     </div>
@@ -582,14 +382,6 @@ async function renderLeaderboard(values, deltaMap = {}) {
     shareBtn.addEventListener('click', () => {
       const deepLink = buildShareLink('leaderboard');
       shareCard(deepLink, 'PFL Leaderboard');
-    });
-  }
-
-  // Festival history entry point
-  const historyCta = container.querySelector('#lbHistoryCta');
-  if (historyCta) {
-    historyCta.addEventListener('click', () => {
-      openFestivalHistory();
     });
   }
 }

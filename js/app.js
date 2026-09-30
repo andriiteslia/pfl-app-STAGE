@@ -13,6 +13,7 @@ import { initPartners } from './partners.js';
 import { fetchAppStyles } from './api.js';
 import { $ } from './utils.js';
 import { initPullToRefresh } from './pull-to-refresh.js';
+import { initFishingLauncher } from './fishing-launcher.js';
 
 // ---- Theme Management ----
 function updateMetaThemeColor(color) {
@@ -362,6 +363,9 @@ async function init() {
   
   // 8. Row highlight in tables
   initRowHighlight();
+
+  // 8b. Fishing mini-game FAB (game loads lazily on the first tap)
+  initFishingLauncher();
   
   // 9. Load initial data for visible tab
   const activeTab = getActiveTab();

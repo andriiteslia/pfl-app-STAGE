@@ -1,0 +1,237 @@
+/* ============================================
+   PFL App — Fishing mini-game: FAB + full-screen container
+   (the game's own styles live in fishing/fishing.css, loaded lazily)
+   ============================================ */
+
+/* ---- FAB «Рибалити!» — the .btn look (like «Оновити»),
+        20px above the tab bar, centred, levitating ---- */
+.fab-fishing {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px) + 64px + 20px); /* tab bar: bottom 28 + pill 64 */
+  width: max-content;
+  margin: 0 auto;
+  padding: 0 22px;
+  z-index: 101;
+  display: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+    0 4px 12px rgba(18, 122, 201, 0.4);          /* same shadow as .fab-back */
+}
+
+.fab-fishing.is-visible {
+  display: inline-flex;
+  animation:
+    fabFishingIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both,
+    fabFishingFloat 3.2s ease-in-out 0.3s infinite;
+}
+
+.fab-fishing:active {
+  transform: scale(0.95);
+}
+
+/* catch counter while the game is minimised (like an unread badge) */
+.fab-fishing__badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 12px;
+  background: #ff8a3d;
+  color: #fff;
+  font-family: 'Manrope', var(--font-ui);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 24px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 2px var(--bg), 0 2px 6px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  animation: fabBadgeIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.fab-fishing__badge[hidden] {
+  display: none;
+}
+
+@keyframes fabBadgeIn {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab-fishing__badge { animation: none; }
+}
+
+/* `translate` (not transform) so the float never fights :active */
+@keyframes fabFishingFloat {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -4px; }
+}
+
+@keyframes fabFishingIn {
+  from { opacity: 0; scale: 0.9; }
+  to   { opacity: 1; scale: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab-fishing.is-visible { animation: none; }
+}
+
+/* keep the last rows of Fests reachable above the FAB */
+body.fishing-fab-visible #app-content {
+  padding-bottom: 160px; /* 96 (tab bar) + 44 (FAB) + 20 (gap) */
+}
+
+/* ---- Full-screen game container (above everything in the app) ---- */
+.fishing-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: var(--bg);             /* same as the app (Fests tab), light/dark theme; seen around the game on wide screens */
+  /* no double-tap / pinch zoom anywhere in the game (splash, HUD, catch sheet).
+     The catch list keeps its own `touch-action: pan-y` so it still scrolls. */
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+.fishing-root[hidden] {
+  display: none;
+}
+
+/* exit: after the splash the whole view fades back to the app */
+.fishing-root.is-closing {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;     /* SPLASH_FADE_MS in fishing-launcher.js */
+}
+
+/* ---- Splash while the game loads (first open) ---- */
+.fishing-splash {
+  position: absolute;
+  inset: 0;
+  z-index: 10;                       /* above #fishingGame */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Figma: linear corner→corner, #B1E3FF top-left → #F6FAFE (solid for the last 19%) bottom-right */
+  background: #F6FAFE linear-gradient(155deg, #B1E3FF 0%, #F6FAFE 81%, #F6FAFE 100%);
+  opacity: 1;
+  transition: opacity 0.3s ease;     /* SPLASH_FADE_MS in fishing-launcher.js */
+}
+
+.fishing-splash[hidden] {
+  display: none;
+}
+
+.fishing-splash.is-hiding {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fishing-splash__logo {
+  width: min(46vw, 240px);         /* ~46% of the screen width, as in the mockup */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fishingLogoFloat 2.4s ease-in-out infinite;
+}
+
+.fishing-splash__logo img {
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.fishing-splash.has-logo .fishing-splash__logo img { opacity: 1; }
+.fishing-splash.no-logo .fishing-splash__logo img  { display: none; }
+
+/* text fallback until game-logo.png is added */
+.fishing-splash__fallback {
+  display: none;
+  font-family: 'Manrope', var(--font-ui);
+  font-size: 40px;
+  font-weight: 800;
+  color: #1e2a4f;
+}
+
+.fishing-splash.no-logo .fishing-splash__fallback { display: block; }
+
+@keyframes fishingLogoFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fishing-splash__logo { animation: none; }
+}
+
+/* small version label at the bottom of the splash (js: GAME_RELEASE) */
+.fishing-splash__version {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(max(env(safe-area-inset-bottom, 0px),
+    var(--tg-safe-area-inset-bottom, 0px) + var(--tg-content-safe-area-inset-bottom, 0px)) + 24px);
+  text-align: center;
+  font-family: 'Manrope', var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #1e2a4f;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ---- Phone turned sideways: the game is portrait only (js: PHONE_LANDSCAPE) ---- */
+.fishing-rotate {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 20;                       /* above the splash and the game */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  color: #1e2a4f;
+  background: #F6FAFE linear-gradient(155deg, #B1E3FF 0%, #F6FAFE 81%, #F6FAFE 100%);   /* same as the splash */
+  font-family: 'Manrope', var(--font-ui);
+}
+
+@media (orientation: landscape) and (max-height: 540px) and (pointer: coarse) {
+  .fishing-rotate { display: flex; }
+}
+
+.fishing-rotate__phone {
+  margin-bottom: 8px;
+  animation: fishingRotatePhone 2.4s ease-in-out infinite;
+}
+
+.fishing-rotate__title {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.fishing-rotate__text {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+/* the phone turns from sideways to upright */
+@keyframes fishingRotatePhone {
+  0%, 20%   { transform: rotate(-90deg); }
+  50%, 100% { transform: rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fishing-rotate__phone { animation: none; }
+}

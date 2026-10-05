@@ -1,0 +1,197 @@
+/* ============================================
+   PFL App — Animations & Easter Eggs
+   Special effects, crab animations, etc.
+   ============================================ */
+
+/* ---- Pull to Refresh ---- */
+.ptr-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 0;
+  overflow: hidden;
+  z-index: 1000;
+  transition: height var(--transition-normal);
+  pointer-events: none;
+}
+
+.ptr-indicator__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: transform var(--transition-normal);
+}
+
+/* ---- Crab Easter Egg: Crown Tap ---- */
+.top3-crown.crab-mode {
+  animation: crown-shake 0.4s ease-in-out 3 !important;
+}
+
+@keyframes crown-shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+/* ---- Crab Easter Egg: Place 2 Long Press ---- */
+.top3-person.shaking {
+  animation: person-shake 0.3s ease-in-out;
+}
+
+@keyframes person-shake {
+  0%, 100% { transform: translateX(0) translateY(var(--person-offset-y, 0)); }
+  20% { transform: translateX(-3px) translateY(var(--person-offset-y, 0)); }
+  40% { transform: translateX(3px) translateY(var(--person-offset-y, 0)); }
+  60% { transform: translateX(-3px) translateY(var(--person-offset-y, 0)); }
+  80% { transform: translateX(3px) translateY(var(--person-offset-y, 0)); }
+}
+
+.crab-popup {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes crab-pop-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px) scale(0.5);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-10px) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes crab-pop-out {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-30px) scale(0.5);
+  }
+}
+
+/* ---- Score Pop Animation ---- */
+.score-pop {
+  animation: score-pop 260ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+
+@keyframes score-pop {
+  0% { transform: scale(0.96); }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* ---- Card Expand Animation ---- */
+.card-expand {
+  animation: card-expand 300ms ease-out both;
+}
+
+@keyframes card-expand {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+.card-collapse {
+  animation: card-collapse 200ms ease-in both;
+}
+
+@keyframes card-collapse {
+  from {
+    opacity: 1;
+    max-height: 500px;
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
+  }
+}
+
+/* ---- Fade In Animation ---- */
+.fade-in {
+  animation: fade-in 300ms ease-out both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Pulse Animation (for notifications) ---- */
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ---- Success Checkmark ---- */
+.success-check {
+  animation: success-check 400ms ease-out both;
+}
+
+@keyframes success-check {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ---- Reduced Motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .top3-crown.crab-mode,
+  .top3-person.shaking,
+  .crab-popup,
+  .score-pop,
+  .card-expand,
+  .card-collapse,
+  .fade-in,
+  .pulse,
+  .success-check {
+    animation: none !important;
+    transition: none !important;
+  }
+}
